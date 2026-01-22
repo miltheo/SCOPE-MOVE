@@ -23,12 +23,6 @@ This repository also hosts the resources required to **reproduce the analyses an
 
 - `analysis/`  
   Scripts and workflows to reproduce manuscript analyses and derived outputs.
-
-- `outputs/`  
-  Generated tables, figures, and intermediate artefacts (as applicable).
-
-- `docs/` 
-  Additional documentation and supporting material.
   
 ---
 
@@ -56,7 +50,7 @@ This repository includes:
 If you use this repository or the SCOPE-MOVE app, please cite:
 
 - **Manuscript**: *[Authors]*. *[Title]*. *[Journal/preprint]*. *[Year]*. DOI: *[DOI]*  
-- **Software**: Theophilus MJ. **SCOPE-MOVE** (version X.Y.Z). GitHub repository. *[Year]*. DOI: *[Zenodo DOI, if minted]*  
+- **Software**: Theophilus MJ. **SCOPE-MOVE** (version X.Y.Z). GitHub repository. *[Year]*. DOI: *[Zenodo DOI, when minted]*  
 
 [add a `CITATION.cff` file for GitHub-native citation support]
 
