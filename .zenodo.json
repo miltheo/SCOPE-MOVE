@@ -1,0 +1,54 @@
+{
+  "title": "SCOPE-MOVE: Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (Shiny web application)",
+  "upload_type": "software",
+  "description": "SCOPE-MOVE is an interactive Shiny web application for exploring evidence from wrist accelerometer prediction model validation studies for 24-hour movement behaviours (physical activity intensity, activity type, sleep-wake, and energy expenditure). The application supports filtering by study and model characteristics and provides visual summaries, pooled estimates, and method contrasts aligned with the accompanying study. This Zenodo record archives a tagged release of SCOPE-MOVE for reproducibility and citation. The specific release version is shown in the Version field of this record.\n\nSource code repository: https://github.com/miltheo/SCOPE-MOVE \nLive application: https://miltheo.shinyapps.io/SCOPE-MOVE/ \n\nWhen citing this version of SCOPE-MOVE, please cite this Zenodo record (version-specific DOI). For citing the project independent of version, use the concept DOI shown on the record page.",
+  "license": "GPL-3.0-or-later",
+  "keywords": [
+    "(MeSH) Accelerometry",
+    "(MeSH) Sleep",
+    "(MeSH) Motor Activity",
+    "(MeSH) Sedentary Behaviour",
+    "Wearables",
+    "Shiny",
+    "meta-analysis",
+    "scoping review"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/miltheo/SCOPE-MOVE",
+      "relation": "isSupplementTo",
+      "resource_type": "software",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://miltheo.shinyapps.io/SCOPE-MOVE/",
+      "relation": "isIdenticalTo",
+      "resource_type": "software",
+      "scheme": "url"
+    }
+  ],
+  "creators": [
+    {
+      "name": "Theophilus, Millen James",
+      "orcid": "0000-0001-9823-7177",
+      "affiliation": "School of Sport, Exercise and Health Sciences, Loughborough University, United Kingdom",
+      "type": "Contact person"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Kingsnorth, Andrew P",
+      "orcid": "0000-0002-2224-5418",
+      "affiliation": "School of Sport, Exercise and Health Sciences, Loughborough University, United Kingdom",
+      "type": "Supervisor"
+    },
+    {
+      "name": "Esliger, Dale W",
+      "orcid": "0000-0002-1236-6419",
+      "affiliation": "School of Sport, Exercise and Health Sciences, Loughborough University, Epinal Way, Loughborough, United Kingdom; NIHR Leicester Biomedical Research Centre, Leicester, United Kingdom; HealthTech Research Centre for Rehabilitation, NIHR, Nottingham, United Kingdom",
+      "type": "Supervisor"
+    }
+  ]
+}
+
+

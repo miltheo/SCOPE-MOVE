@@ -132,3 +132,5 @@ All scripts write outputs into analysis/outputs/ and overwrite existing files of
 
 - Forest plots and pooled estimates are computed using the same modelling approach used in the manuscript.
 - Scripts are intended to be deterministic given the same input CSVs.
+=======
+- Scripts are intended to be deterministic given the same input CSVs.
