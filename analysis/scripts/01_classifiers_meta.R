@@ -9,8 +9,14 @@ rm(list = ls()); gc()
 # -----------------------------
 # Paths
 # -----------------------------
-in_dir  <- file.path("..", "analysis", "inputs")
-out_dir <- file.path("..", "analysis", "outputs", "classifiers")
+
+in_dir  <- file.path("analysis", "inputs")
+out_dir <- file.path("analysis", "outputs", "classifiers")
+
+# uncomment these 3 lines if you want to run locally
+# in_dir  <- file.path("..", "analysis", "inputs") 
+# out_dir <- file.path("..", "analysis", "outputs", "classifiers")
+
 csv_path <- file.path(in_dir, "Extraction_Models_Master Sheet with Validation IDs.csv")
 stopifnot(file.exists(csv_path))
 

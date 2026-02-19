@@ -9,8 +9,12 @@ rm(list = ls()); gc()
 # -----------------------------
 # Paths
 # -----------------------------
-in_dir  <- file.path("..", "analysis", "inputs")
-out_dir <- file.path("..", "analysis", "outputs", "study_characteristics")
+in_dir  <- file.path("analysis", "inputs")
+out_dir <- file.path("analysis", "outputs", "study_characteristics")
+
+# in_dir  <- file.path("..", "analysis", "inputs")
+# out_dir <- file.path("..", "analysis", "outputs", "study_characteristics")
+
 csv_path <- file.path(in_dir, "Study_characteristics.csv")
 stopifnot(file.exists(csv_path))
 

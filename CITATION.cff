@@ -1,11 +1,14 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it."
-title: "Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE)"
+title: "Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application"
 version: 1.0.3
 date-released: 2026-02-19
 license: GPL-3.0-or-later
+repository-code: "https://github.com/miltheo/SCOPE-MOVE"
+url: "https://miltheo.shinyapps.io/SCOPE-MOVE/"
+type: software
 authors:
   - family-names: Theophilus
     given-names: Millen James
-    affiliation: Loughborough University
-    orcid: https://orcid.org/0000-0001-9823-7177
+    affiliation: "School of Sport, Exercise and Health Sciences, Loughborough University, United Kingdom"
+    orcid: "https://orcid.org/0000-0001-9823-7177"

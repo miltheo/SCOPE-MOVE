@@ -47,13 +47,21 @@ This repository includes:
 
 ## Citation 📣
 
-If you use this repository or the SCOPE-MOVE app, please cite:
+If you use SCOPE-MOVE, please cite the associated scoping review study and software release (Zenodo):
 
-- **Manuscript**: *[Authors]*. *[Title]*. *[Journal/preprint]*. *[Year]*. DOI: *[DOI]*  
-- **Software**: Theophilus MJ. **SCOPE-MOVE** (version X.Y.Z). GitHub repository. *[Year]*. DOI: *[Zenodo DOI, when minted]*  
+### Study (must)
+- *[Authors]*. *[Title]*. *[Journal/preprint]*. *[Year]*. DOI: *[DOI]*  
 
-[add a `CITATION.cff` file for GitHub-native citation support]
+### Software (version release, recommended)
+- Theophilus, M. J. Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application (v1.0.3). Zenodo. DOI: *[version DOI]*
 
+### Software (project-level, independent of version)
+- Theophilus, M. J. Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application. Zenodo. DOI: *[concept DOI]*
+
+Notes:
+- The GitHub repository is the development home: https://github.com/miltheo/SCOPE-MOVE
+- The live application is hosted at: https://miltheo.shinyapps.io/SCOPE-MOVE/
+- The live app may update over time. For reproducibility, cite the Zenodo archived release.
 ---
 
 ## Contributing 🤝
@@ -61,6 +69,7 @@ If you use this repository or the SCOPE-MOVE app, please cite:
 Issues and pull requests are welcome, especially for:
 - bug reports and UI improvements
 - extending app functionality
+- collaboration
 
 Please open an issue describing the change and its rationale.
 
