@@ -47,16 +47,7 @@ This repository includes:
 
 ## Citation 📣
 
-If you use SCOPE-MOVE, please cite the associated scoping review study and software release (Zenodo):
-
-### Study (must)
-- *[Authors]*. *[Title]*. *[Journal/preprint]*. *[Year]*. DOI: *[DOI]*  
-
-### Software (version release, recommended)
-- Theophilus, M. J. Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application (v1.0.3). Zenodo. DOI: *[version DOI]*
-
-### Software (project-level, independent of version)
-- Theophilus, M. J. Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application. Zenodo. DOI: *[concept DOI]*
+If you use SCOPE-MOVE, please cite the associated scoping review study and software release from the Zenodo entry: https://doi.org/10.5281/zenodo.18704633
 
 Notes:
 - The GitHub repository is the development home: https://github.com/miltheo/SCOPE-MOVE

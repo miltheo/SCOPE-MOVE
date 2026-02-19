@@ -3,6 +3,7 @@ message: "If you use this software, please cite it."
 title: "Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application"
 version: 1.0.3
 date-released: 2026-02-19
+doi: https://doi.org/10.5281/zenodo.18704634
 license: GPL-3.0-or-later
 repository-code: "https://github.com/miltheo/SCOPE-MOVE"
 url: "https://miltheo.shinyapps.io/SCOPE-MOVE/"
