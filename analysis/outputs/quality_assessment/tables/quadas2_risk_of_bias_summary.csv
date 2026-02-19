@@ -1,0 +1,17 @@
+Domain,Rating,n,Percent,label
+Patient selection/study design,Low,28,20.437956204379564,"20.4%
+(N=28)"
+Patient selection/study design,High,109,79.56204379562044,"79.6%
+(N=109)"
+Index measure,Low,124,90.51094890510949,"90.5%
+(N=124)"
+Index measure,High,13,9.489051094890511,"9.5%
+(N=13)"
+Criterion measure,Low,95,69.34306569343066,"69.3%
+(N=95)"
+Criterion measure,High,42,30.656934306569344,"30.7%
+(N=42)"
+Flow/timing,Low,65,47.44525547445255,"47.4%
+(N=65)"
+Flow/timing,High,72,52.55474452554745,"52.6%
+(N=72)"

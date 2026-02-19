@@ -1,0 +1,4 @@
+metric,validations,studies_reporting,participants_total_approx,median_n_per_validation,iqr_low,iqr_high
+f1_mean,65,36,3672,27,20,40
+sens_mean,134,73,4934,30,22,40
+spec_mean,129,69,4833,31,22,40

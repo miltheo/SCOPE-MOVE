@@ -1,7 +1,7 @@
 # SCOPE-MOVE 🧭
 
 **SCOPE-MOVE** (SCOPing Explorer of accelerometer-based prediction models for 24-hour MOVEment behaviour analysis) is an interactive **Shiny** dashboard for exploring **criterion validation performance** of wrist accelerometer-based prediction models for 24-hour movement behaviour classification.  
-This repository also hosts the resources required to **reproduce the analyses and outputs** reported in the accompanying manuscript.
+This repository also hosts the resources required to **reproduce the analyses and outputs** reported in the accompanying scoping review study.
 
 ## Live app 🌐
 [SCOPE-MOVE](https://miltheo.shinyapps.io/SCOPE-MOVE/)
@@ -11,7 +11,7 @@ This repository also hosts the resources required to **reproduce the analyses an
 ## What you will find here ✨
 
 - **Shiny app** for interactive exploration of extracted study metadata and validation metrics (interactive forest plot plus pooled summaries).
-- **Reproducibility resources** for regenerating key manuscript results, figures, and tables.
+- **Reproducibility resources** for regenerating key study results, figures, and tables.
 - **Folder-level documentation** describing how to run the app and reproduce analyses (kept within the relevant directories).
 
 ---
@@ -22,17 +22,17 @@ This repository also hosts the resources required to **reproduce the analyses an
   Shiny application source code.
 
 - `analysis/`  
-  Scripts and workflows to reproduce manuscript analyses and derived outputs.
+  Scripts and workflows to reproduce study analyses and derived outputs.
   
 ---
 
-## Associated manuscript 📝
+## Associated study 📝
 
-- **Title**: *[Add manuscript title]*  
-- **Status**: *[preprint / under review / accepted]*  
+- **Title**: *[Criterion validity and transparency in wrist accelerometry for 24-hour movement behaviour analysis: a scoping review]*  
+- **Status**: *[draft]*  
 - **DOI**: *[add DOI when available]*  
 
-If you use SCOPE-MOVE in academic work, please cite the manuscript and the repository release (see Citation).
+If you use SCOPE-MOVE in academic work, please cite this study and the repository release (see Citation).
 
 ---
 
@@ -40,7 +40,7 @@ If you use SCOPE-MOVE in academic work, please cite the manuscript and the repos
 
 This repository includes:
 - **Code** (open source; see License).
-- **Derived datasets** used for the app and analyses (see `app/data/` and `analysis/data/` for provenance and any restrictions).
+- **Derived datasets** used for the app and analyses.
 - **Study-level metadata** extracted from publications for evidence synthesis.
 
 ---

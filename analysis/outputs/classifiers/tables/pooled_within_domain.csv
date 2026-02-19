@@ -1,0 +1,10 @@
+domain,metric,k_rows,clusters,pooled_std_est,pooled_std_lb,pooled_std_ub,kept_mods
+Activity intensity,F1,13,8,0.7547,0.7236,0.7859,"c_n_classes, c_k_folds, miss_k_folds, env_re"
+Activity intensity,Sensitivity,50,23,0.8039,0.7096,0.8982,"c_n_classes, c_k_folds, miss_k_folds, env_re"
+Activity intensity,Specificity,50,23,0.8289,0.7537,0.9041,"c_n_classes, c_k_folds, miss_k_folds, env_re"
+Activity type,F1,21,15,0.8538,0.8137,0.894,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re"
+Activity type,Sensitivity,42,22,0.8479,0.7868,0.909,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re"
+Activity type,Specificity,39,19,0.879,0.8209,0.9371,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re"
+Sleep,F1,31,15,0.864,0.7942,0.9338,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re"
+Sleep,Sensitivity,42,27,0.9206,0.8945,0.9468,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re"
+Sleep,Specificity,40,26,0.6684,0.6143,0.7225,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re"

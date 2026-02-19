@@ -1,0 +1,4 @@
+metric,k_rows,clusters,vcov_type,kept_mods,pooled_std_est,pooled_std_lb,pooled_std_ub
+F1,37,27,CR2,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re, dom_re",0.8555,0.8047,0.9064
+Sensitivity,45,33,CR2,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re, dom_re",0.9289,0.8903,0.9674
+Specificity,41,29,CR2,"c_n_classes, c_k_folds, miss_k_folds, env_re, prot_re, dom_re",0.7952,0.6731,0.9172
