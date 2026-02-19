@@ -107,10 +107,14 @@ All scripts write outputs into analysis/outputs/ and overwrite existing files of
 **Tables**
 - `ee_meta_results_all.csv`
 - `ee_method_contrast_results_overall.csv`
+
 **Figures**:
 - `forest_MAPE_all.png`
 
 ### 03_study_characteristics_figures.R
+
+**Tables**
+- `country_counts.csv (optional convenience)`
 
 **Figures**
 - `year_bar_all.png`
@@ -126,12 +130,10 @@ All scripts write outputs into analysis/outputs/ and overwrite existing files of
 - `health_status_pie.png`
 - `sampling_rate_pie.png`
 
-**Tables**
-- `country_counts.csv (optional convenience)`
-
 ### 04_quadas2_figure.R
 **Tables**
 - `quadas2_risk_of_bias_summary.csv`
+
 **Figures**
 - `quadas2_risk_of_bias.png`
 
