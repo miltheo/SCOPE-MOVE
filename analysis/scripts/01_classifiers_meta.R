@@ -13,7 +13,7 @@ rm(list = ls()); gc()
 in_dir  <- file.path("analysis", "inputs")
 out_dir <- file.path("analysis", "outputs", "classifiers")
 
-# uncomment these 3 lines if you want to run locally
+# uncomment these 2 lines if you want to run locally
 # in_dir  <- file.path("..", "analysis", "inputs") 
 # out_dir <- file.path("..", "analysis", "outputs", "classifiers")
 
