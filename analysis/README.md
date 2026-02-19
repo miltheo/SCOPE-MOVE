@@ -50,23 +50,30 @@ R (>= 4.2 recommended). The scripts install required packages if missing.
 
 ## How to run
 
-From the project root:
+### Step 0: Clone the repository
+```bash
+git clone https://github.com/miltheo/SCOPE-MOVE.git
+```
+
+```bash
+cd SCOPE-MOVE
+```
 
 Option A (recommended, from R):
+Open R in the project root (the folder that contains analysis/), then run:
 ```r
-setwd("<project root>")
-source("analysis/01_classifiers_meta.R")
-source("analysis/02_energy_expenditure_meta.R")
-source("analysis/03_study_characteristics_figures.R")
-source("analysis/04_quadas2_figure.R")
+source("analysis/inputs/01_classifiers_meta.R")
+source("analysis/inputs/02_energy_expenditure_meta.R")
+source("analysis/inputs/03_study_characteristics_figures.R")
+source("analysis/inputs/04_quadas2_figure.R")
 ```
 
 Option B (command line):
 ```bash
-Rscript analysis/01_classifiers_meta.R
-Rscript analysis/02_energy_expenditure_meta.R
-Rscript analysis/03_study_characteristics_figures.R
-Rscript analysis/04_quadas2_figure.R
+Rscript analysis/inputs/01_classifiers_meta.R
+Rscript analysis/inputs/02_energy_expenditure_meta.R
+Rscript analysis/inputs/03_study_characteristics_figures.R
+Rscript analysis/inputs/04_quadas2_figure.R
 ```
 
 ## Outputs produced
@@ -132,5 +139,4 @@ All scripts write outputs into analysis/outputs/ and overwrite existing files of
 
 - Forest plots and pooled estimates are computed using the same modelling approach used in the manuscript.
 - Scripts are intended to be deterministic given the same input CSVs.
-=======
 - Scripts are intended to be deterministic given the same input CSVs.
