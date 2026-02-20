@@ -7,7 +7,7 @@ This repository also hosts the resources required to **reproduce the analyses an
 [SCOPE-MOVE](https://miltheo.shinyapps.io/SCOPE-MOVE/)
 
 ## Zenodo release 🔗
-[SCOPE-MOVE archived release](https://doi.org/10.5281/zenodo.18712820)
+[SCOPE-MOVE archived release](https://doi.org/10.5281/zenodo.18704633)
 
 ---
 
@@ -50,7 +50,7 @@ This repository includes:
 
 ## Citation 📣
 
-If you use SCOPE-MOVE, please cite the associated scoping review study and software release from the Zenodo entry: https://doi.org/10.5281/zenodo.18712820.
+If you use SCOPE-MOVE, please cite the associated scoping review study and software version release from the Zenodo entry.
 
 Notes:
 - The GitHub repository is the development home: https://github.com/miltheo/SCOPE-MOVE

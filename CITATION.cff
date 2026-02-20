@@ -4,7 +4,6 @@ title: "Scoping explorer of accelerometer-based prediction models for 24-hour mo
 version: 1.0.3
 date-released: 2026-02-19
 license: GPL-3.0-or-later
-doi: "https://doi.org/10.5281/zenodo.18712820"
 repository-code: "https://github.com/miltheo/SCOPE-MOVE"
 url: "https://miltheo.shinyapps.io/SCOPE-MOVE/"
 type: software

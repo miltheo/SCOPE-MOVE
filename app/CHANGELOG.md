@@ -7,10 +7,20 @@ Internal refactors and maintenance are not listed.
 
 | Version | Date       | Release type | User-visible changes (summary) |
 |---|----:|---|--------|
+| 1.0.4   | 2026-02-20 | Patch        | Added Data Dictionary and harmonised file names. |
 | 1.0.3   | 2026-02-15 | Patch        | Replaced the sidebar theme selector with a persistent floating theme toggle and redesigned the Home and Instructions tabs (tiles, breakdown bars, collapsible sections). |
 | 1.0.2   | 2026-02-05 | Patch        | Added theme selector (System, Light, Dark). Implemented app-wide dark-mode styling (cards, inputs, dataset table). Improved plot rendering for dark mode (text, hover styling, pooled line contrast) and reduced plot grid clutter. Updated Home page guidance and headline stats. |
 | 1.0.1   | 2026-01-21 | Patch        | Added Home tab with summary statistics and resource links. Rebuilt Forest Plot layout with fixed sidebar and scrollable plot region. Added pooled estimate card and pooling method toggle (Simple vs Manuscript). Improved forest plot labels and legend styling. |
 | 1.0.0   | Prototype  | Baseline     | Initial prototype with interactive forest plot + filters, pooled estimate line, DOI click-through, dataset table, and instructions page. |
+
+## 1.0.4 (2026-02-20)
+
+### Added
+- Data_Dictionary.pdf to repository in /analysis/inputs/
+
+### Changed
+- Nothing in the app, app is same as 1.0.3.
+- Harmonised model grouping conventions in file names.
 
 ## 1.0.3 (2026-02-15)
 
