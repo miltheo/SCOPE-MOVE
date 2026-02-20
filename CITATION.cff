@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software or repository, please cite it."
 title: "Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application"
-version: 1.0.4
+version: 1.0.5
 date-released: 2026-02-19
 license: GPL-3.0-or-later
 repository-code: "https://github.com/miltheo/SCOPE-MOVE"

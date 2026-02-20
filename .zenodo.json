@@ -4,7 +4,7 @@
   "description": "SCOPE-MOVE is an interactive Shiny web application for exploring evidence from wrist accelerometer prediction model validation studies for 24-hour movement behaviours (physical activity intensity, activity type, sleep-wake, and energy expenditure). The application supports filtering by study and model characteristics and provides visual summaries, pooled estimates, and method contrasts aligned with the accompanying study. This Zenodo record archives a tagged release of SCOPE-MOVE for reproducibility and citation. The specific release version is shown in the Version field of this record.\n\nSource code repository: https://github.com/miltheo/SCOPE-MOVE\nLive application: https://miltheo.shinyapps.io/SCOPE-MOVE/\n\nWhen citing this version of SCOPE-MOVE, please cite this Zenodo record (version-specific DOI). For citing the project independent of version, use the concept DOI shown on the record page.",
   "license": "GPL-3.0-or-later",
   "access_right": "open",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "keywords": [
     "accelerometry",
     "sleep",

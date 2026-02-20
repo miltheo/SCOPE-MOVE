@@ -1,5 +1,5 @@
 # ======================================================================
-# SCOPE-MOVE v1.0.4
+# SCOPE-MOVE v1.0.5
 # - Code for the shiny web app, SCOPE-MOVE.
 # - Code version 6.1 5Feb26
 # - Author: Millen J. Theophilus
@@ -1216,13 +1216,17 @@ ui <- fluidPage(
                                            tags$h4(style = "margin-top: 14px;", "Resources"),
                                            tags$p(class = "inst-note",
                                                   tags$a("Repository", href = "https://github.com/miltheo/SCOPE-MOVE", target = "_blank", rel = "noopener"),
-                                                  " | Version 1.0.4 | GPL-3.0"
+                                                  " | Version 1.0.5 | GPL-3.0"
                                            ),
                                            
                                            tags$p(tags$b("Study DOI: "),
                                                   tags$a("DOI link will be added here", href = "https://doi.org/XXXX", target = "_blank", rel = "noopener")),
+                                           
+                                           tags$p(tags$b("Zenodo DOI: "),
+                                                  tags$a("DOI link will be added here", href = "https://doi.org/10.5281/zenodo.18704633", target = "_blank", rel = "noopener")),
+                                           
                                            tags$p(class = "inst-note",
-                                                     "If you are using SCOPE-MOVE in your work, please cite the original study and the Zenodo release version."
+                                                     "If you are using SCOPE-MOVE in your work, please cite the original study and the Zenodo release."
                                            ),
                                            tags$p(tags$b("Author and maintainer: "), "Millen J. Theophilus")
                                   )
