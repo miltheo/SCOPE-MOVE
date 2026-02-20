@@ -15,7 +15,7 @@ out_dir <- file.path("analysis", "outputs", "quality_assessment")
 # in_dir  <- file.path("..", "analysis", "inputs")
 # out_dir <- file.path("..", "analysis", "outputs", "quality_assessment")
 
-csv_path <- file.path(in_dir, "Quality Assessment.csv")
+csv_path <- file.path(in_dir, "Quality_Assessment.csv")
 stopifnot(file.exists(csv_path))
 
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)                         # make base output dir

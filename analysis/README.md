@@ -14,10 +14,10 @@ analysis/
     04_quadas2_figure.R
   inputs/
     Data_Dictionary.pdf
-    Extraction_Energy Expenditure Models with Validation IDs.csv
-    Extraction_Models_Master Sheet with Validation IDs.csv
-    Quality Assessment.csv
-    Study_characteristics.csv
+    Extraction_EnergyExpenditure.csv
+    Extraction_Classifiers.csv
+    Quality_Assessment.csv
+    Study_Characteristics.csv
   outputs/
     classifiers/
       tables/

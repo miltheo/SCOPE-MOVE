@@ -17,7 +17,7 @@ out_dir <- file.path("analysis", "outputs", "energy_expenditure")
 # in_dir  <- file.path("..", "analysis", "inputs") 
 # out_dir <- file.path("..", "analysis", "outputs", "energy_expenditure")
 
-csv_path <- file.path(in_dir, "Extraction_Energy Expenditure Models with Validation IDs.csv")
+csv_path <- file.path(in_dir, "Extraction_EnergyExpenditure.csv")
 stopifnot(file.exists(csv_path))
 
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)                         # make base output dir

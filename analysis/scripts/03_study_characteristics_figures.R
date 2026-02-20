@@ -15,7 +15,7 @@ out_dir <- file.path("analysis", "outputs", "study_characteristics")
 # in_dir  <- file.path("..", "analysis", "inputs")
 # out_dir <- file.path("..", "analysis", "outputs", "study_characteristics")
 
-csv_path <- file.path(in_dir, "Study_characteristics.csv")
+csv_path <- file.path(in_dir, "Study_Characteristics.csv")
 stopifnot(file.exists(csv_path))
 
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)                         # make base output dir

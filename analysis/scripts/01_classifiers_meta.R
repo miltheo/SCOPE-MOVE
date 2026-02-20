@@ -17,7 +17,7 @@ out_dir <- file.path("analysis", "outputs", "classifiers")
 # in_dir  <- file.path("..", "analysis", "inputs") 
 # out_dir <- file.path("..", "analysis", "outputs", "classifiers")
 
-csv_path <- file.path(in_dir, "Extraction_Models_Master Sheet with Validation IDs.csv")
+csv_path <- file.path(in_dir, "Extraction_Classifiers.csv")
 stopifnot(file.exists(csv_path))
 
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
