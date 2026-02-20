@@ -47,7 +47,7 @@ This repository includes:
 
 ## Citation 📣
 
-If you use SCOPE-MOVE, please cite the associated scoping review study and software release from the Zenodo entry: https://doi.org/10.5281/zenodo.18704633
+If you use SCOPE-MOVE, please cite the associated scoping review study and software release from the Zenodo entry.
 
 Notes:
 - The GitHub repository is the development home: https://github.com/miltheo/SCOPE-MOVE
