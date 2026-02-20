@@ -1,4 +1,4 @@
-# SCOPE-MOVE 🧭
+# SCOPE-MOVE 🔭
 
 **SCOPE-MOVE** (SCOPing Explorer of accelerometer-based prediction models for 24-hour MOVEment behaviour analysis) is an interactive **Shiny** dashboard for exploring **criterion validation performance** of wrist accelerometer-based prediction models for 24-hour movement behaviour classification.  
 This repository also hosts the resources required to **reproduce the analyses and outputs** reported in the accompanying scoping review study.
