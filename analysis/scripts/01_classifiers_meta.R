@@ -703,7 +703,7 @@ if (run_method_subgroups) {
         df <- build_plot_df(d_thr, m); pooled <- get_pooled(m, res_thr)
         plot_forest(df, pooled, paste0("Forest-style plot: ", m, " (traditional)"), paste0("forest_", m, "_traditional.png"))
         df <- build_plot_df(d_oth, m); pooled <- get_pooled(m, res_oth)
-        plot_forest(df, pooled, paste0("Forest-style plot: ", m, " (non-traditional)"), paste0("forest_", m, "_other.png"))
+        plot_forest(df, pooled, paste0("Forest-style plot: ", m, " (non-traditional)"), paste0("forest_", m, "_nontraditional.png"))
     }
 }
 

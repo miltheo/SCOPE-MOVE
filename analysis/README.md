@@ -12,6 +12,7 @@ analysis/
     02_energy_expenditure_meta.R
     03_study_characteristics_figures.R
     04_quadas2_figure.R
+    Data_Dictionary.pdf
   outputs/
     classifiers/
       tables/
@@ -85,7 +86,7 @@ All scripts write outputs into analysis/outputs/ and overwrite existing files of
 **Tables**
 - `meta_results_all.csv`
 - `meta_results_threshold.csv`
-- `meta_results_other.csv`
+- `meta_results_nontraditional.csv`
 - `pooled_within_domain.csv`
 - `method_contrast_results_overall.csv`
 - `method_contrast_by_domain.csv`
@@ -98,7 +99,7 @@ All scripts write outputs into analysis/outputs/ and overwrite existing files of
 - `forest_F1_all.png`
 - `forest_Sensitivity_all.png`
 - `forest_Specificity_all.png`
-- `forest_*_threshold.png` and `forest_*_other.png` (if enabled)
+- `forest_*_threshold.png` and `forest_*_nontraditional.png` (if enabled)
 - `forest_*_bydomain_<domain>.png` (if enabled)
 
 
@@ -118,7 +119,7 @@ All scripts write outputs into analysis/outputs/ and overwrite existing files of
 
 **Figures**
 - `year_bar_all.png`
-- `year_bar_threshold_vs_other.png`
+- `year_bar_threshold_vs_nontraditional.png`
 - `year_bar_by_method.png`
 - `country_bar.png`
 - `country_bubble.png`

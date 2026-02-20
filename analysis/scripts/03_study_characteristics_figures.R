@@ -61,7 +61,7 @@ p_year_thr <- dat |>
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
           legend.position = "bottom")
 
-ggsave(file.path(out_dir, "figures", "year_bar_threshold_vs_other.png"),
+ggsave(file.path(out_dir, "figures", "year_bar_threshold_vs_nontraditional.png"),
        p_year_thr, width = 10, height = 10, dpi = 600, device = ragg::agg_png)
 
 palette_vals <- c(
