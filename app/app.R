@@ -1223,7 +1223,7 @@ ui <- fluidPage(
                                                   tags$a("DOI link will be added here", href = "https://doi.org/XXXX", target = "_blank", rel = "noopener")),
                                            
                                            tags$p(tags$b("Zenodo DOI: "),
-                                                  tags$a("DOI link will be added here", href = "https://doi.org/10.5281/zenodo.18704633", target = "_blank", rel = "noopener")),
+                                                  tags$a("Versioned release", href = "https://doi.org/10.5281/zenodo.18704633", target = "_blank", rel = "noopener")),
                                            
                                            tags$p(class = "inst-note",
                                                      "If you are using SCOPE-MOVE in your work, please cite the original study and the Zenodo release."

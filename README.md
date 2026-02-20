@@ -6,7 +6,7 @@ This repository also hosts the resources required to **reproduce the analyses an
 ## Live app 🌐
 [SCOPE-MOVE](https://miltheo.shinyapps.io/SCOPE-MOVE/)
 
-## Zenodo release 🔗
+## Zenodo entry 🔗
 [SCOPE-MOVE archived release](https://doi.org/10.5281/zenodo.18704633)
 
 ---

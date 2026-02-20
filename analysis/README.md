@@ -7,12 +7,17 @@ This folder reproduces all analysis outputs reported in the manuscript, includin
 ```pgsql
 analysis/
   README.md
-  inputs/
+  scripts/
     01_classifiers_meta.R
     02_energy_expenditure_meta.R
     03_study_characteristics_figures.R
     04_quadas2_figure.R
+  inputs/
     Data_Dictionary.pdf
+    Extraction_Energy Expenditure Models with Validation IDs.csv
+    Extraction_Models_Master Sheet with Validation IDs.csv
+    Quality Assessment.csv
+    Study_characteristics.csv
   outputs/
     classifiers/
       tables/
