@@ -137,44 +137,114 @@ ggsave(file.path(out_dir, "figures", "country_bubble.png"),
 # -----------------------------
 # UpSet helper
 # -----------------------------
-save_upset <- function(data, set_col, file_name, sets_max = 6, n_intersects = 30, sets_label = "Studies per set") {
+save_upset <- function(
+        data, set_col, file_name,
+        sets_max = 6, n_intersects = 30, sets_label = "Studies per set",
+        width_in = 10, height_in = 8,
+        set_size_num_size = 5.5,
+        set_size_pad = 1.40,
+        text_scale = c(1.9, 1.6, 1.8, 1.5, 1.8, 2.0),
+        point_size = 3.2,
+        line_size = 0.9
+) {
+
     long <- data |>
-        separate_rows({{ set_col }}, sep = ";\\s*") |>
-        mutate(v = str_trim({{ set_col }})) |>
-        filter(!is.na(v), v != "") |>
-        distinct(id, v)
-    
+        tidyr::separate_rows({{ set_col }}, sep = ";\\s*") |>
+        dplyr::mutate(v = stringr::str_trim({{ set_col }})) |>
+        dplyr::filter(!is.na(v), v != "") |>
+        dplyr::distinct(id, v)
+
     wide <- long |>
-        mutate(present = 1L) |>
+        dplyr::mutate(present = 1L) |>
         tidyr::pivot_wider(names_from = v, values_from = present, values_fill = 0L) |>
-        as.data.frame()
-    
+        as.data.frame(check.names = FALSE)
+
     set_names <- setdiff(names(wide), "id")
     freq <- colSums(wide[, set_names, drop = FALSE])
     ord <- names(sort(freq, decreasing = TRUE))
-    ord <- ord[seq_len(min(length(ord), sets_max))]
-    sets_for_plot <- rev(ord)
+    sets_for_plot <- rev(ord[seq_len(min(length(ord), sets_max))])
+
+    set_size_limit <- ceiling(max(freq[sets_for_plot], na.rm = TRUE) * set_size_pad / 5) * 5
+
+    png_file <- file.path(out_dir, "figures", file_name)
+
+    ragg::agg_png(
+        filename = png_file,
+        width = width_in,
+        height = height_in,
+        units = "in",
+        res = 600,
+        background = "white"
+    )
+
+    on.exit(dev.off(), add = TRUE)
+
+    up <- UpSetR::upset(
+        wide,
+        sets = sets_for_plot,
+        keep.order = TRUE,
+        nintersects = n_intersects,
+        order.by = "freq",
+        mb.ratio = c(0.65, 0.35),
+        point.size = point_size,
+        line.size = line_size,
+        mainbar.y.label = "Number of studies",
+        sets.x.label = sets_label,
+        show.numbers = "yes",
+        number.angles = 0,
+        set_size.show = TRUE,
+        set_size.numbers_size = set_size_num_size,
+        set_size.angles = 0,
+        set_size.scale_max = set_size_limit,
+        text.scale = text_scale
+    )
     
-    up <- UpSetR::upset(wide,
-                        sets = sets_for_plot,
-                        keep.order = TRUE,
-                        nintersects = n_intersects,
-                        order.by = "freq",
-                        mb.ratio = c(0.65, 0.35),
-                        point.size = 3,
-                        mainbar.y.label = "Number of studies",
-                        sets.x.label = sets_label,
-                        text.scale = c(1.8, 1.5, 1.4, 1.2, 1.8, 2))
-    
-    g <- grid::grid.grabExpr(print(up), wrap.grobs = TRUE)
-    
-    ggsave(file.path(out_dir, "figures", file_name),
-           plot = g, width = 10, height = 10, dpi = 600, device = ragg::agg_png, units = "in")
+    print(up)
 }
 
-save_upset(dat, age_group, "age_group_upset.png", sets_max = 4, sets_label = "Studies per age group")
-save_upset(dat, outcomes, "outcomes_upset.png", sets_max = 6, sets_label = "Studies per outcome")
-save_upset(dat, device_brand, "devices_upset.png", sets_max = 4, sets_label = "Studies per device")
+save_upset(
+    dat, age_group, "age_group_upset.png",
+    sets_max = 10,
+    sets_label = "Studies per age group",
+    width_in = 10,
+    height_in = 8,
+    set_size_num_size = 7,
+    set_size_pad = 1.45,
+    text_scale = c(1.9, 1.6, 1.8, 1.5, 1.8, 2.0),
+    point_size = 3.2,
+    line_size = 0.9
+)
+
+save_upset(
+    dat, outcomes, "outcomes_upset.png",
+    sets_max = 10,
+    sets_label = "Studies per outcome",
+    width_in = 10,
+    height_in = 8,
+    set_size_num_size = 7,
+    set_size_pad = 1.45,
+    text_scale = c(1.9, 1.6, 1.8, 1.5, 1.8, 2.0),
+    point_size = 3.2,
+    line_size = 0.9
+)
+
+save_upset(
+    dat, device_brand, "devices_upset.png",
+    sets_max = 30,
+    n_intersects = 30,
+    sets_label = "Studies per device",
+    width_in = 12,
+    height_in = 12,
+    set_size_num_size = 9,
+    set_size_pad = 1.50,
+    text_scale = c(2, 1.3, 1.6, 1.4, 2, 2.5),
+    point_size = 2.8,
+    line_size = 0.8
+)
+
+# save_upset(dat, age_group, "age_group_upset.png", sets_max = 10, sets_label = "Studies per age group")
+# save_upset(dat, outcomes, "outcomes_upset.png", sets_max = 10, sets_label = "Studies per outcome")
+# save_upset(dat, device_brand, "devices_upset.png", sets_max = 30, sets_label = "Studies per device")
 
 # -----------------------------
 # Sample size figures

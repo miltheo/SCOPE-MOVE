@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SCOPE-MOVE Evidence Explorer</title>
+  <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon-32.png?v=3" type="image/png" sizes="32x32">
+  <link rel="alternate icon" href="favicon.ico?v=3">
+  <link rel="stylesheet" href="styles.css?v=10">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-lockup">
+      <div class="brand-logos">
+        <a href="https://labda-project.eu/" target="_blank" rel="noopener" aria-label="Open LABDA project website"><img src="assets/labda_logo.png" alt="LABDA logo"></a>
+        <a href="https://www.lboro.ac.uk/" target="_blank" rel="noopener" aria-label="Open Loughborough University website"><img class="lu-logo" src="assets/lu_logo.png" alt="Loughborough University logo"></a>
+      </div>
+      <div>
+        <p class="eyebrow">SCOPE-MOVE evidence explorer for method selection</p>
+        <h1>SCOPE-MOVE</h1>
+        <p class="subtitle">An interactive dashboard to explore research studies training or testing wrist-accelerometer-based prediction models for classifying sleep, sedentary behaviour, or physical activity.</p>
+      </div>
+    </div>
+    <div class="header-tools">
+      <button id="themeToggle" class="icon-button" type="button" aria-label="Toggle dark mode">Dark</button>
+      <div class="author-panel">
+        <span>Author: Millen J. Theophilus</span>
+        <a href="https://github.com/miltheo/SCOPE-MOVE" target="_blank" rel="noopener">GitHub repository</a>
+      </div>
+      <div class="source-chip" id="sourceChip">Loading data</div>
+    </div>
+  </header>
+
+  <nav class="view-tabs" aria-label="SCOPE-MOVE sections">
+    <button class="tab active" data-view="overview">Overview</button>
+    <button class="tab" data-view="explorer">Primary Tool</button>
+    <button class="tab" data-view="ranking">Model Ranking</button>
+    <button class="tab" data-view="landscape">Studies</button>
+    <button class="tab" data-view="quality">Quality</button>
+    <button class="tab" data-view="instructions">Instructions</button>
+    <button class="tab" data-view="data">Data</button>
+  </nav>
+
+  <main>
+    <section id="overview" class="view active">
+      <div class="section-head overview-hero-head">
+        <div>
+          <p class="eyebrow">Welcome</p>
+          <h2>Are you looking to compare and select a wrist accelerometer-based algorithm or model to classify sleep, sedentary behaviour, or physical activity?</h2>
+        </div>
+        <div class="guide-actions">
+          <button class="ghost-button nav-action primary" data-target-view="explorer">Start Primary Tool</button>
+          <button class="ghost-button nav-action" data-target-view="landscape">Profile populations and devices</button>
+          <button class="ghost-button nav-action" data-target-view="instructions">Read instructions</button>
+        </div>
+      </div>
+      <section class="panel overview-purpose">
+        <div>
+          <p class="eyebrow">Purpose</p>
+          <h3>Purpose of SCOPE-MOVE</h3>
+          <p>SCOPE-MOVE addresses a practical barrier in 24-hour movement behaviour research: locating and comparing candidate accelerometer-based prediction models across heterogeneous criterion validation studies. It turns the associated scoping review's validation-level evidence into a reusable digital resource for comparing methods, checking study context, and supporting evidence-guided method selection.</p>
+        </div>
+        <div class="purpose-actions">
+          <button class="route-step nav-action" data-target-view="explorer">Compare validation estimates</button>
+          <button class="route-step nav-action" data-target-view="quality">Check quality alongside estimates</button>
+          <button class="route-step nav-action" data-target-view="instructions">Understand definitions and pooled lines</button>
+        </div>
+      </section>
+      <div id="summaryCards" class="metric-grid"></div>
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Your use-case and navigational route</h3>
+          <span>Choose the path closest to your task</span>
+        </div>
+        <div id="overviewRouteCards"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Evidence density matrix</h3>
+          <span>Click a cell to open the matching performance view</span>
+        </div>
+        <div id="evidenceMatrix"></div>
+      </section>
+    </section>
+
+    <section id="explorer" class="view">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Primary tool</p>
+          <h2>Interactive validation explorer</h2>
+          <p class="tool-help">Use filters to narrow the evidence, then compare summary tiles, forest estimates, and selected rows. Open the <button class="inline-action nav-action" type="button" data-target-view="instructions">Instructions</button> for definitions and interpretation details.</p>
+        </div>
+        <div class="guide-actions">
+          <button class="ghost-button nav-action" data-target-view="instructions">Interpretation guide</button>
+          <button class="ghost-button nav-action" data-target-view="data" data-dataset="appRemlLong2">Open validation table</button>
+          <button id="resetFilters" class="ghost-button">Reset filters</button>
+        </div>
+      </div>
+      <div class="tool-layout">
+        <aside class="filter-panel">
+          <label>Metric
+            <select id="metricSelect"></select>
+            <span class="filter-hint" title="F1 summarises balance across classification performance. Sensitivity is true-positive detection. Specificity is true-negative exclusion.">Choose the reported performance measure.</span>
+          </label>
+          <label>Validation type
+            <select id="validationSelect"></select>
+            <span class="filter-hint" title="External validation uses a dataset collected separately from training data. Cross-validation, hold-out, split-sample, and apparent validation use internal data structures.">How the model was tested.</span>
+          </label>
+          <label>Environment
+            <select id="environmentSelect"></select>
+            <span class="filter-hint" title="The setting in which validation or testing data were collected, such as laboratory, free-living, or mixed contexts.">Validation data-collection setting.</span>
+          </label>
+          <label>Protocol
+            <select id="protocolSelect"></select>
+            <span class="filter-hint" title="The activity structure used during validation or testing, for example structured tasks, semi-structured protocols, or free-living observation.">Activity structure during testing.</span>
+          </label>
+          <label>Age group
+            <select id="ageSelect"></select>
+            <span class="filter-hint" title="Participant age category recorded for the validation row. Rows with multiple groups may appear under more than one option.">Participant age category.</span>
+          </label>
+          <label>Device
+            <select id="deviceSelect"></select>
+            <span class="filter-hint" title="Wearable brand or device recorded for the validation row. Rows with multiple devices may appear under more than one option.">Validation wearable or brand.</span>
+          </label>
+          <label>Search
+            <input id="performanceSearch" type="search" placeholder="Study, method, device">
+            <span class="filter-hint" title="Searches the selected validation rows by study, method, domain, device, age group, validation type, and related row metadata.">Find a study, method, or device.</span>
+          </label>
+          <label>Sort
+            <select id="sortSelect">
+              <option value="estimateDesc">Estimate descending</option>
+              <option value="estimate">Estimate ascending</option>
+              <option value="study">Study</option>
+              <option value="domain">Domain</option>
+            </select>
+            <span class="filter-hint" title="Sorting changes the forest-view row order only. It does not change estimates, pooled lines, or selected rows.">Order the forest-view rows.</span>
+          </label>
+          <label>Pooled line
+            <select id="poolMethodSelect">
+              <option value="manuscript">Manuscript covariate pooled line</option>
+              <option value="simple">Simple random-effects line, no covariates</option>
+            </select>
+            <span class="filter-hint" title="The manuscript option uses available manuscript covariates where possible. The simple option uses a random-effects line with no covariates.">Reference line for orientation.</span>
+          </label>
+          <fieldset>
+            <legend>Domains</legend>
+            <p class="filter-hint" title="Movement behaviour outcome families: activity intensity, activity type, and sleep-related classification.">Movement behaviour outcome families.</p>
+            <div id="domainChecks" class="check-list"></div>
+          </fieldset>
+          <fieldset>
+            <legend>Model groups</legend>
+            <p class="filter-hint" title="Broad modelling families extracted from the source studies, including threshold/rule-based, classical machine-learning, deep-learning, and statistical approaches where present.">Broad prediction-model families.</p>
+            <div id="methodChecks" class="check-list"></div>
+          </fieldset>
+        </aside>
+        <section class="workspace-panel">
+          <div id="performanceCards" class="metric-grid compact"></div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Forest view</h3>
+              <div class="panel-actions">
+                <span id="pooledLineNote"></span>
+                <button id="refreshForestPlot" class="mini-action" type="button" title="Refresh forest plot after resizing">Refresh plot</button>
+              </div>
+            </div>
+            <div class="plot-size-controls" aria-label="Forest plot sizing controls">
+              <label class="plot-size-field" title="Leave blank for automatic viewport height. Enter any larger value to make the plot area taller.">Height px
+                <input id="forestHeightInput" type="number" min="180" step="20" placeholder="Auto">
+              </label>
+              <label class="plot-size-field" title="Scales the SVG width. Values above 100 add horizontal scrolling for wider inspection.">Width %
+                <input id="forestWidthScaleInput" type="number" min="40" step="10" value="100">
+              </label>
+              <label class="plot-size-field" title="Controls vertical spacing between validation rows. Larger values make dense plots easier to read.">Row px
+                <input id="forestRowHeightInput" type="number" min="12" step="2" value="24">
+              </label>
+              <button id="resetForestSize" class="mini-action" type="button" title="Return forest plot size to the default">Reset size</button>
+            </div>
+            <div id="forestLegend" class="legend-row"></div>
+            <div id="poolDetails" class="pool-details"></div>
+            <div id="forestChart" class="chart-scroll"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Selected validation rows</h3>
+              <span id="selectedRowCount"></span>
+            </div>
+            <div id="selectedTable" class="table-wrap"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="ranking" class="view">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Exploratory model ranking</p>
+          <h2>Externally validated model shortlist</h2>
+        </div>
+        <div class="guide-actions">
+          <button class="ghost-button nav-action" data-target-view="explorer">Inspect estimates</button>
+          <button class="ghost-button nav-action" data-target-view="data" data-dataset="classifierInput">Open classifier data</button>
+        </div>
+      </div>
+      <div id="modelRankingCards" class="metric-grid compact"></div>
+      <section class="panel">
+        <div class="panel-head"><h3>Ranking framework</h3><span>Transparent, evidence-guiding score</span></div>
+        <div class="ranking-framework">
+          <div><strong>Eligibility</strong><p>Only models named in at least one external-validation source field are ranked. Rows marked as newly developed or not previously published are not used to create a model identity.</p></div>
+          <div><strong>Harmonisation</strong><p>Model names are harmonised from the prior-publication field by extracting author-year model tokens and normalising spelling variants and algorithm wording. Hildebrand 2014 and Hildebrand 2017 cutpoint references are combined because many external validations cite those cutpoints together.</p></div>
+          <div><strong>Evidence rows</strong><p>Each eligible model is linked to its external validations and cross-validations when the source field or original study author-year matches the harmonised model identity.</p></div>
+          <div><strong>Performance</strong><p>Performance uses F1 when available. If F1 is not reported, the score falls back to the mean of sensitivity and specificity when available.</p></div>
+          <div><strong>Composite score</strong><p>The ranking score is the equal-weight mean of external-validation breadth, average performance, and device breadth. It is an exploratory shortlist, not a claim of universal superiority.</p></div>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Model evidence details</h3><span>Top ranked models by domain family</span></div>
+        <div id="modelRankingDetails" class="ranking-detail-grid"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Ranked models</h3><span id="modelRankingCount"></span></div>
+        <div id="modelRankingTable" class="table-wrap"></div>
+      </section>
+    </section>
+
+    <section id="instructions" class="view">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Interpretation guide</p>
+          <h2>Use, interpretation, and source-link guidance</h2>
+        </div>
+        <div class="guide-actions">
+          <button class="ghost-button nav-action" data-target-view="explorer">Open Primary Tool</button>
+          <button class="ghost-button nav-action" data-target-view="overview">View evidence overview</button>
+          <button class="ghost-button nav-action" data-target-view="data" data-dataset="classifierInput">Inspect extraction data</button>
+        </div>
+      </div>
+      <section class="panel">
+        <div class="panel-head"><h3>Instructions and interpretation guide</h3><span>Progressive disclosure</span></div>
+        <details class="details" open>
+          <summary>How to use SCOPE-MOVE</summary>
+          <div class="details-body">
+            <ol class="plain-list">
+              <li>Start with the Overview to confirm the purpose of the app, the evidence base size, and the main navigation routes.</li>
+              <li>Use the Primary Tool to compare validation-level estimates. Select the metric, filter by domain, model group, age group, device, validation type, environment, and protocol, then inspect the summary tiles and forest view.</li>
+              <li>Read the pooled line as an orientation aid, not as a universal benchmark. Rows above the pooled line and rows marked as external validations should be checked against the study context, protocol, population, device, and source paper.</li>
+              <li>Use Model Ranking for an exploratory shortlist of externally validated model identities. Expand a model card to review devices, age groups, validation types, and studies that externally validated the model.</li>
+              <li>Use Studies to understand the broader evidence landscape, including publication timing, countries, device brands, participant characteristics, and the compact prediction model type chart.</li>
+              <li>Use Quality to inspect study-level risk-of-bias summaries and the concise signalling-question wording behind SQ1-SQ11.</li>
+              <li>Use Data to inspect the bundled source and derived tables when you need extraction-level detail or want to audit a displayed result.</li>
+              <li>Use DOI links and the data dictionary when selecting or reusing a candidate method. The app supports evidence-guided selection; it does not declare a universally best model.</li>
+            </ol>
+          </div>
+        </details>
+        <details class="details">
+          <summary>Definitions and field guide</summary>
+          <div class="details-body definition-grid">
+            <div><strong>Prediction model</strong><p>An accelerometer-based algorithm, threshold, rule, statistical model, machine-learning model, or deep-learning model used to estimate or classify a 24-hour movement behaviour outcome.</p></div>
+            <div><strong>24-hour movement behaviours</strong><p>The app uses this umbrella term for activity intensity, activity type, sleep-wake behaviour, and energy expenditure outcomes derived or estimated from wearable accelerometry.</p></div>
+            <div><strong>F1</strong><p>Harmonic mean of precision and sensitivity. Higher is better.</p></div>
+            <div><strong>Sensitivity</strong><p>True positive rate or recall. Higher is better.</p></div>
+            <div><strong>Specificity</strong><p>True negative rate. Higher is better.</p></div>
+            <div><strong>MAPE</strong><p>Mean absolute percentage error for energy expenditure. Lower is better.</p></div>
+            <div><strong>Index measure</strong><p>The wrist-worn accelerometer model, algorithm, or processing method being evaluated.</p></div>
+            <div><strong>Criterion measure</strong><p>The reference method used to judge validity, such as calorimetry, doubly labelled water, video or direct observation, or polysomnography, depending on the outcome.</p></div>
+            <div><strong>Activity intensity</strong><p>Time spent in physical activity intensity categories such as sedentary, light, moderate, or vigorous, commonly benchmarked against indirect calorimetry and MET-based thresholds.</p></div>
+            <div><strong>Activity type</strong><p>Discrete activity classes such as walking, running, cycling, or sedentary behaviour, commonly benchmarked against direct or video observation.</p></div>
+            <div><strong>Sleep-wake</strong><p>Binary sleep versus wake classification, commonly benchmarked against polysomnography.</p></div>
+            <div><strong>Energy expenditure</strong><p>Estimated energy cost or expenditure outcome, commonly validated against calorimetry or doubly labelled water depending on the target construct.</p></div>
+            <div><strong>Traditional model group</strong><p>Threshold, heuristic rule-based, and general linear model approaches. Typically simpler and more interpretable.</p></div>
+            <div><strong>Non-traditional model group</strong><p>Classical machine learning, deep learning, temporal, ensemble, and other more complex approaches.</p></div>
+            <div><strong>Split-sample validation</strong><p>A dataset is divided into model-development and validation or testing subsets.</p></div>
+            <div><strong>Hold-out validation</strong><p>A two-set split in which one set is used for training and the other for validation or testing.</p></div>
+            <div><strong>Cross-validation</strong><p>Repeated training and testing splits where performance is averaged across folds or repetitions.</p></div>
+            <div><strong>Apparent validation</strong><p>The model is trained and validated on the same training data from the same cohort.</p></div>
+            <div><strong>Structured protocol</strong><p>Prescribed activities or timings, usually in controlled settings.</p></div>
+            <div><strong>Unstructured protocol</strong><p>Naturalistic or free-living routines with participant autonomy.</p></div>
+            <div><strong>Hybrid protocol</strong><p>A mixed design that combines prescribed elements and participant-led routines.</p></div>
+            <div><strong>Laboratory environment</strong><p>Validation data collected in controlled laboratory or clinic-like conditions.</p></div>
+            <div><strong>Free-living environment</strong><p>Validation data collected in home, community, school, or other naturalistic settings.</p></div>
+            <div><strong>External validation</strong><p>Testing on a different dataset collected separately from training data. These rows are marked with a diamond and EXT tag.</p></div>
+            <div><strong>Study sample size</strong><p>The recruited or study-level participant count from the study-characteristics extraction.</p></div>
+            <div><strong>Validation participants</strong><p>The number of participants in a validation or test set. In leave-one-subject-out cross-validation this can equal the number of outer folds.</p></div>
+            <div><strong>Device brand</strong><p>The wearable manufacturer or brand recorded in Study_Characteristics.csv. The Studies tab device landscape uses brands only, not model names.</p></div>
+            <div><strong>Sampling rate</strong><p>The acceleration acquisition frequency. It is a device-processing field, not participant sample size.</p></div>
+            <div><strong>Metric origin</strong><p>How a reported performance metric was produced, for example macro-averaging across classes, micro-averaging pooled counts, per-class reporting, aggregate confusion matrix computation, or unclear origin.</p></div>
+            <div><strong>SD origin</strong><p>The extracted source of standard deviation or variation, such as participants, validation folds, behaviour classes, folds plus classes, external test variation, or not reported.</p></div>
+            <div><strong>Model source / prior publication</strong><p>The extraction field describing whether the model was published previously and, when reported, which prior study or algorithm it came from.</p></div>
+            <div><strong>Pooled line</strong><p>The vertical dashed line in the Primary Tool. The manuscript option uses available manuscript covariates; the simple option uses no covariates.</p></div>
+            <div><strong>Above pooled</strong><p>Rows with estimates greater than the current pooled line. They are highlighted to guide follow-up inspection, not to declare a best model.</p></div>
+            <div><strong>DOI linkage</strong><p>Clicking DOI-linked validation rows opens the source paper in a new tab.</p></div>
+            <div><strong>QUADAS-2 domains</strong><p>Quality domains are patient selection/study design, index measure, criterion measure, and flow/timing.</p></div>
+            <div><strong>Signalling questions</strong><p>SQ1-SQ11 are the quality-tool responses extracted in the quality CSV. Hover a response bar or SQ chip to see the signalling-question wording.</p></div>
+          </div>
+        </details>
+        <details id="qualityGuide" class="details">
+          <summary>Quality signalling-question list</summary>
+          <div class="details-body">
+            <p class="panel-copy">This list gives the minimal wording behind SQ1-SQ11 for interpreting the app summaries. It is not an instruction manual for re-performing the assessment.</p>
+            <div class="signal-legend">
+              <span class="signal-chip yes">Yes</span>
+              <span class="signal-chip no">No</span>
+              <span class="signal-chip unclear">Unclear</span>
+              <span class="signal-chip na">NA</span>
+            </div>
+            <div id="qualityGuideDetails" class="quality-guide-grid"></div>
+          </div>
+        </details>
+        <details class="details">
+          <summary>Data dictionary and raw input files</summary>
+          <div class="details-body">
+            <p class="panel-copy">The data dictionary describes the raw input files used to generate the analyses and app data bundle. App-facing definitions, interpretation notes, and hover-field explanations are presented in the Definitions and field guide panel above.</p>
+            <p><a id="dataDictionaryInstructionLink" class="link-button" href="#" target="_blank" rel="noopener">Open raw-input data dictionary</a></p>
+          </div>
+        </details>
+        <details class="details">
+          <summary>How plotted estimates, pooled lines, and cautions are derived</summary>
+          <div class="details-body">
+            <ul class="plain-list">
+              <li>Each plotted point is the extracted validation performance metric for a specific validation. The classifier metrics are F1, sensitivity, and specificity.</li>
+              <li>Metrics were extracted as the unweighted mean and standard deviation across behaviour classes when reported.</li>
+              <li>When mean and SD were not reported but class-specific performance was reported, metrics were macro-averaged across classes to obtain an unweighted mean and SD.</li>
+              <li>When a confusion matrix included validation counts for each behaviour class, metrics were computed and macro-averaged across classes to obtain an unweighted mean and SD.</li>
+              <li>Extracted SDs were converted to sampling variances and divided by cross-validation folds when SDs reflected CV, or by number of behaviour classes when SDs reflected class variation. When SDs were unavailable, a lower-bounded behaviour-domain-specific median constant variance was used to stabilise weights.</li>
+              <li>The constructed variance was used to build the displayed 95% confidence interval for each validation estimate.</li>
+              <li>For meta-analysis, classifier metrics are analysed on the logit scale and back-transformed to proportions for display.</li>
+              <li>The manuscript pooled line represents a participant-weighted meta-regression orientation for the selected subset, using the manuscript covariate set where available. The simple pooled line is a random-effects line with no covariates.</li>
+              <li>The manuscript covariate pooled line uses the manuscript covariate set: centred number of behaviour classes, centred validation folds, missingness indicators, test environment, test protocol, and behaviour domain.</li>
+              <li>Covariates that are constant or effectively unavailable in the filtered subset are dropped from that pooled-line calculation and listed under the plot.</li>
+              <li>The simple random-effects line uses the validation table variances and includes no covariates.</li>
+              <li>The dashed pooled line can mask heterogeneity across behaviours, protocols, devices, and populations.</li>
+              <li>Missing metrics reflect reporting and extraction availability, not automatic exclusion by this app.</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+    </section>
+
+    <section id="landscape" class="view">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Scoping review landscape</p>
+          <h2>Study population, countries, and device landscape</h2>
+        </div>
+        <div class="guide-actions">
+          <button class="ghost-button nav-action" data-target-view="explorer">Open Primary Tool</button>
+          <button class="ghost-button nav-action" data-target-view="data" data-dataset="studyCharacteristics">Open study data</button>
+        </div>
+      </div>
+      <div class="split-layout landscape-chart-row">
+        <section class="panel">
+          <div class="panel-head"><h3>Publication timeline</h3><span>Publication year on the x-axis, stacked by model complexity</span></div>
+          <div id="yearChart"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h3>Continents and countries</h3><span>Continents on the y-axis, country segments on each bar</span></div>
+          <div id="countryChart"></div>
+        </section>
+      </div>
+      <div class="split-layout">
+        <section class="panel">
+          <div class="panel-head"><h3>Device landscape</h3><span>Wearable brands from Study_Characteristics.csv only</span></div>
+          <div id="deviceOutcomeChart"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h3>Participant information</h3><span>Sample size, sex reporting, ethnicity reporting, and health status</span></div>
+          <div id="sampleChart"></div>
+        </section>
+      </div>
+      <section class="panel">
+        <div class="panel-head"><h3>Prediction model periodic chart</h3><span>Model sub-types grouped by modelling family</span></div>
+        <div id="modelTypeLandscape"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Study index</h3><span id="studyIndexCount"></span></div>
+        <div id="studyIndex" class="table-wrap"></div>
+      </section>
+    </section>
+
+    <section id="quality" class="view">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Transparency and risk of bias</p>
+          <h2>Study-level quality and signalling questions</h2>
+        </div>
+        <div class="guide-actions">
+          <button class="ghost-button nav-action" data-target-view="instructions" data-scroll-target="qualityGuide">How to interpret signalling questions</button>
+          <button class="ghost-button nav-action" data-target-view="data" data-dataset="qualityAssessment">Open quality data</button>
+        </div>
+      </div>
+      <div id="qualitySummaryCards" class="metric-grid compact"></div>
+      <div class="data-controls quality-controls">
+        <label>Search quality assessment
+          <input id="qualitySearch" type="search" placeholder="Study ID or title">
+        </label>
+        <label>Risk filter
+          <select id="qualityRiskSelect">
+            <option value="ALL">All studies</option>
+            <option value="ANY_HIGH">Any high-risk domain</option>
+            <option value="ALL_LOW">All domains low risk</option>
+            <option value="D1_HIGH">Patient selection/study design high risk</option>
+            <option value="D2_HIGH">Index measure high risk</option>
+            <option value="D3_HIGH">Criterion measure high risk</option>
+            <option value="D4_HIGH">Flow and timing high risk</option>
+          </select>
+        </label>
+      </div>
+      <div class="split-layout">
+        <section class="panel">
+          <div class="panel-head"><h3>Domain-level risk</h3><span>From Quality_Assessment.csv</span></div>
+          <div id="qualityBars"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h3>Signalling questions</h3><span>Yes, No, Unclear, and NA response mix</span></div>
+          <div id="qualitySignals"></div>
+        </section>
+      </div>
+      <section class="panel">
+        <div class="panel-head"><h3>Per-study inspection</h3><span id="qualityStudyCount"></span></div>
+        <div id="qualityStudyCards" class="quality-study-grid"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Quality assessment table</h3><span>Filtered study rows</span></div>
+        <div id="qualityStudyTable" class="table-wrap"></div>
+      </section>
+    </section>
+
+    <section id="data" class="view">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Data workbench</p>
+          <h2>Inspect source and derived tables</h2>
+        </div>
+        <div class="guide-actions">
+          <button class="ghost-button nav-action" data-target-view="instructions">Data guide</button>
+          <button id="downloadCsv" class="ghost-button">Download current table</button>
+        </div>
+      </div>
+      <div class="data-controls">
+        <label>Dataset
+          <select id="datasetSelect"></select>
+        </label>
+        <label>Search table
+          <input id="datasetSearch" type="search" placeholder="Search rows">
+        </label>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3 id="datasetTitle">Dataset</h3><span id="datasetMeta"></span></div>
+        <div id="datasetTable" class="table-wrap large-table"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-intro">
+      <p class="eyebrow">Documentation and citation</p>
+      <h2>Citation, repository, and data notes</h2>
+      <p class="footer-author">Author: Millen J. Theophilus | <a href="https://github.com/miltheo/SCOPE-MOVE" target="_blank" rel="noopener">github.com/miltheo/SCOPE-MOVE</a></p>
+      <p>SCOPE-MOVE is an applied digital resource linked to a future scoping review study currently at journal submission stage. Use the software citation, Zenodo metadata, and forthcoming manuscript citation together when reporting reuse.</p>
+    </div>
+    <div id="footerDocCards" class="doc-grid footer-docs"></div>
+  </footer>
+
+  <div id="tooltip" role="tooltip"></div>
+
+  <script src="data.js?v=10"></script>
+  <script src="app.js?v=10"></script>
+</body>
+</html>

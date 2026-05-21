@@ -1,82 +1,35 @@
-# SCOPE-MOVE 🔭
+# SCOPE-MOVE
 
-**SCOPE-MOVE** (SCOPing Explorer of accelerometer-based prediction models for 24-hour MOVEment behaviour analysis) is an interactive **Shiny** dashboard for exploring **criterion validation performance** of wrist accelerometer-based prediction models for 24-hour movement behaviour classification.  
-This repository also hosts the resources required to **reproduce the analyses and outputs** reported in the accompanying scoping review study.
+**SCOPE-MOVE** is a repository for software and reproducibility resources linked to a scoping review of wrist-accelerometer prediction models for 24-hour movement behaviour research.
 
-## Live app 🌐
-[SCOPE-MOVE](https://miltheo.shinyapps.io/SCOPE-MOVE/)
+- Public app: https://scope-move.miltheo.com
+- Source: https://github.com/miltheo/SCOPE-MOVE
+- Zenodo archive: https://doi.org/10.5281/zenodo.18704633
 
-## Zenodo entry 🔗
-[SCOPE-MOVE archived release](https://doi.org/10.5281/zenodo.18704633)
+## Overview
 
----
+This repository contains:
 
-## What you will find here ✨
+- `app/`: the SCOPE-MOVE web application and its app-specific documentation.
+- `analysis/`: extraction inputs, analysis scripts, and analysis documentation.
+- `CHANGELOG.md`, `CITATION.cff`, and `.zenodo.json`: repository-level release, citation, and archive metadata.
 
-- **Shiny app** for interactive exploration of extracted study metadata and validation metrics (interactive forest plot plus pooled summaries).
-- **Reproducibility resources** for regenerating key study results, figures, and tables.
-- **Folder-level documentation** describing how to run the app and reproduce analyses (kept within the relevant directories).
+Generated analysis outputs under `analysis/outputs/` are intentionally ignored by Git. They can be regenerated locally from the scripts and inputs in `analysis/`.
 
----
+## Documentation
 
-## Repository structure 📁
+- App details, deployment notes, and app data rebuild instructions are in `app/README.md`.
+- Analysis input and script details are in `analysis/README.md`.
 
-- `app/`  
-  Shiny application source code.
+## Citation
 
-- `analysis/`  
-  Scripts and workflows to reproduce study analyses and derived outputs.
-  
----
+If you use SCOPE-MOVE, cite the software release archived on Zenodo and the associated scoping review study when available.
 
-## Associated study 📝
+## Maintainer
 
-- **Title**: *[Criterion validity and transparency in wrist accelerometry for 24-hour movement behaviour analysis: a scoping review]*  
-- **Status**: *[draft]*  
-- **DOI**: *[add DOI when available]*  
+Millen J. Theophilus
+GitHub: https://github.com/miltheo
 
-If you use SCOPE-MOVE in academic work, please cite this study and the repository release (see Citation).
+## License
 
----
-
-## Data and licensing 🔒
-
-This repository includes:
-- **Code** (open source; see License).
-- **Derived datasets** used for the app and analyses.
-- **Study-level metadata** extracted from publications for evidence synthesis.
-
----
-
-## Citation 📣
-
-If you use SCOPE-MOVE, please cite the associated scoping review study and software version release from the Zenodo entry.
-
-Notes:
-- The GitHub repository is the development home: https://github.com/miltheo/SCOPE-MOVE
-- The live application is hosted at: https://miltheo.shinyapps.io/SCOPE-MOVE/
-- The live app may update over time. For reproducibility, cite the Zenodo archived release.
----
-
-## Contributing 🤝
-
-Issues and pull requests are welcome, especially for:
-- bug reports and UI improvements
-- extending app functionality
-- collaboration
-
-Please open an issue describing the change and its rationale.
-
----
-
-## Contact 📫
-
-Maintainer: **Millen J. Theophilus**  
-GitHub: `miltheo`  
-Institution: Loughborough University, UK
-
----
-
-## License ✅
-
-Released under the **GNU General Public License v3.0 (GPL-3.0)**. See `LICENSE`.
+Released under the GNU General Public License v3.0 or later (GPL-3.0-or-later). See `LICENSE`.

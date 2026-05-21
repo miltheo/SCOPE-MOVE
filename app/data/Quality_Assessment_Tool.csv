@@ -1,0 +1,22 @@
+Item,Domain 1: Patient Selection/Study Design
+,Signalling Questions,Instructions,Yes/No/Unclear/NA
+1,Did the study include a range of activities concerning the 24-hour movement behaviour outcomes?,,Yes/No/Unclear/NA
+2,Did the study protocol include at least one activity with natural transitions? (NA for sleep studies),,Yes/No/Unclear/NA
+3,Did the study provide comprehensive information about the inclusion/exclusion criteria of the recruiting process?,,Yes/No/Unclear/NA
+4,Did the study include at least a sample of 20 participants?,,Yes/No/Unclear/NA
+
+Item,Domain 2: Index Measure
+,Signalling Questions,Instructions,Yes/No/Unclear/NA
+5,Was the classification/association method used in the prediction model reported and selected input features justified?,,Yes/No/Unclear/NA
+6,"If a threshold was used, was it prespecified or was the threshold calibration process clearly described and justified? If training of non-threshold-based models was done, were the training procedures clearly described or further information cited?",,Yes/No/Unclear/NA
+
+Item,Domain 3: Criterion Measure
+,Signalling Questions,Instructions,Yes/No/Unclear/NA
+7,"Is the selected criterion measure the gold-standard for the respective outcome? (i.e., calorimetry or doubly labelled water for activity intensity or energy expenditure, video observation for activity type, and polysomnography for sleep)",,Yes/No/Unclear/NA
+8,Were the reference standards consistently applied across all participants? (NA for direct observation),,Yes/No/Unclear/NA
+
+Item,Domain 4: Flow and Timing
+,Signalling Questions,Instructions,Yes/No/Unclear/NA
+9,Did the authors provide detailed information about data synchronisation between the index and criterion measures? (NA for direct observation),,Yes/No/Unclear/NA
+10,"Were all participants included in the analyses, and if not, were reasons for exclusion and handling of missing data provided and justified?",,Yes/No/Unclear/NA
+11,Was the index measure validated against the criterion measure using independent datasets or cross-validation methods?,,Yes/No/Unclear/NA

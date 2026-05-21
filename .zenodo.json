@@ -1,18 +1,18 @@
 {
-  "title": "Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application",
+  "title": "SCOPE-MOVE: Evidence Explorer for Method Selection",
   "upload_type": "software",
-  "description": "SCOPE-MOVE is an interactive Shiny web application for exploring evidence from wrist accelerometer prediction model validation studies for 24-hour movement behaviours (physical activity intensity, activity type, sleep-wake, and energy expenditure). The application supports filtering by study and model characteristics and provides visual summaries, pooled estimates, and method contrasts aligned with the accompanying study. This Zenodo record archives a tagged release of SCOPE-MOVE for reproducibility and citation. The specific release version is shown in the Version field of this record.\n\nSource code repository: https://github.com/miltheo/SCOPE-MOVE\nLive application: https://miltheo.shinyapps.io/SCOPE-MOVE/\n\nWhen citing this version of SCOPE-MOVE, please cite this Zenodo record (version-specific DOI). For citing the project independent of version, use the concept DOI shown on the record page.",
+  "description": "SCOPE-MOVE is an interactive dashboard to explore research studies training or testing wrist-accelerometer-based prediction models for classifying sleep, sedentary behaviour, or physical activity. Version 2.0.0 replaces the earlier Shiny prototype with a static HTML, CSS, and JavaScript Evidence Explorer. The repository preserves the reproducible extraction inputs, analysis scripts, app data-building workflow, and manuscript-facing outputs associated with the scoping review study, which is currently at journal submission stage.",
   "license": "GPL-3.0-or-later",
   "access_right": "open",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "keywords": [
     "accelerometry",
-    "sleep",
-    "motor activity",
-    "sedentary behaviour",
     "wearables",
-    "Shiny",
-    "meta-analysis",
+    "24-hour movement behaviour",
+    "criterion validity",
+    "prediction models",
+    "evidence explorer",
+    "static web application",
     "scoping review"
   ],
   "related_identifiers": [
@@ -23,10 +23,16 @@
       "scheme": "url"
     },
     {
-      "identifier": "https://miltheo.shinyapps.io/SCOPE-MOVE/",
-      "relation": "isVersionOf",
+      "identifier": "https://scope-move.miltheo.com",
+      "relation": "isIdenticalTo",
       "resource_type": "software",
       "scheme": "url"
+    },
+    {
+      "identifier": "https://doi.org/10.5281/zenodo.18704633",
+      "relation": "isVersionOf",
+      "resource_type": "software",
+      "scheme": "doi"
     }
   ],
   "creators": [

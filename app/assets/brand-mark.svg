@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="MJT brand mark">
+  <rect width="120" height="120" rx="28" fill="#0b344f"/>
+  <g fill="#ffffff">
+    <rect x="18" y="34" width="8" height="52" rx="2"/>
+    <rect x="48" y="34" width="8" height="52" rx="2"/>
+    <polygon points="27,34 36,34 44,62 37,62"/>
+    <polygon points="47,34 38,34 31,62 38,62"/>
+    <rect x="68" y="34" width="8" height="39" rx="2"/>
+    <path d="M57 70h8c0 6 3 9 8 9s8-3 8-9h8c0 11-7 17-16 17-10 0-16-6-16-17z"/>
+    <rect x="84" y="34" width="30" height="8" rx="2"/>
+    <rect x="95" y="34" width="8" height="52" rx="2"/>
+  </g>
+</svg>

@@ -14,7 +14,7 @@ in_dir  <- file.path("analysis", "inputs")
 out_dir <- file.path("analysis", "outputs", "classifiers")
 
 # uncomment these 2 lines if you want to run locally
-# in_dir  <- file.path("..", "analysis", "inputs") 
+# in_dir  <- file.path("..", "analysis", "inputs")
 # out_dir <- file.path("..", "analysis", "outputs", "classifiers")
 
 csv_path <- file.path(in_dir, "Extraction_Classifiers.csv")
@@ -102,22 +102,53 @@ plt_style <- list(
     x_label_accuracy = 1,
     x_limits = c(0, 1),
     shape_vals = c(cv_folds = 16, classes = 17, external = 15, constant = 1),
-    shape_labs = c(cv_folds = "From CV folds",
-                   classes  = "From classes",
-                   external = "External test SD",
-                   constant = "Constant"),
+    shape_labs = c(
+        cv_folds = "From CV folds",
+        classes  = "From classes",
+        external = "External test SD",
+        constant = "Constant"
+    ),
     okabe_ito = c(
         "#CC79A7", "#E69F00", "#56B4E9", "#009E73",
         "#F0E442", "#0072B2", "#D55E00", "#000000"
     ),
-    domain_levels = c("Sleep","Activity type","Activity intensity","Energy expenditure")
+    domain_levels = c(
+        "Sleep",
+        "Activity type",
+        "Activity intensity",
+        "Energy expenditure"
+    )
 )
 
 make_domain_palette <- function(levels, style = plt_style) {
-    lev <- style$domain_levels[style$domain_levels %in% levels]
-    if (!length(lev)) lev <- levels
-    pal <- style$okabe_ito[seq_along(lev)]
-    stats::setNames(pal, lev)
+
+    observed <- unique(as.character(levels))
+    observed <- observed[!is.na(observed) & observed != ""]
+
+    canonical <- style$domain_levels
+
+    base_pal <- stats::setNames(
+        style$okabe_ito[seq_along(canonical)],
+        canonical
+    )
+
+    extra <- sort(setdiff(observed, canonical))
+
+    if (length(extra)) {
+        extra_pal <- stats::setNames(
+            rep(style$okabe_ito[(length(canonical) + 1):length(style$okabe_ito)],
+                length.out = length(extra)),
+            extra
+        )
+        base_pal <- c(base_pal, extra_pal)
+    }
+
+    ordered_levels <- c(
+        canonical[canonical %in% observed],
+        extra
+    )
+
+    base_pal[ordered_levels]
 }
 
 # -----------------------------
@@ -136,8 +167,22 @@ domain_col <- dplyr::case_when(
     "outcome" %in% names(dat0) ~ "outcome",
     TRUE ~ NA_character_
 )
-dat0$domain <- if (!is.na(domain_col)) factor(dat0[[domain_col]]) else factor("Unknown")
+if (!is.na(domain_col)) {
 
+    domain_chr <- stringr::str_squish(as.character(dat0[[domain_col]]))
+    domain_chr[is.na(domain_chr) | domain_chr == ""] <- "Unknown"
+
+    extra_domain_levels <- sort(setdiff(unique(domain_chr), plt_style$domain_levels))
+
+    dat0$domain <- factor(
+        domain_chr,
+        levels = c(plt_style$domain_levels, extra_domain_levels)
+    )
+
+} else {
+
+    dat0$domain <- factor("Unknown")
+}
 if (!"study" %in% names(dat0)) stop("Column 'study' is required (FirstAuthor Year).")
 
 dat0 <- dat0 |>
@@ -607,8 +652,8 @@ build_plot_df <- function(d, metric_name) {
         dplyr::mutate(
             se_use = sqrt(vi_use),
             est    = mean,
-            ci_l   = inv_logit(yi - 1.96 * se_use),
-            ci_u   = inv_logit(yi + 1.96 * se_use),
+            ci_l   = pmax(0, pmin(est, inv_logit(yi - 1.96 * se_use))),
+            ci_u   = pmin(1, pmax(est, inv_logit(yi + 1.96 * se_use))),
             auth_year = first_author_year(dplyr::cur_data_all()),
             method_lab = ifelse(is.na(method) | method == "", "Method n.r.", method),
             row_lab = glue::glue("{auth_year} - {method_lab} - {val_id}")
@@ -630,39 +675,73 @@ get_pooled_domain <- function(metric_name, dom, res_tbl_domain) {
 }
 
 plot_forest <- function(df, pooled, title_txt, file_name, style = plt_style) {
-    
-    dom_levels <- style$domain_levels[style$domain_levels %in% unique(as.character(df$domain))]
-    if (!length(dom_levels)) dom_levels <- sort(unique(as.character(df$domain)))
-    dom_pal <- make_domain_palette(dom_levels, style)
-    
+
+    observed_domains <- unique(as.character(df$domain))
+    observed_domains <- observed_domains[!is.na(observed_domains) & observed_domains != ""]
+
+    dom_levels <- c(
+        style$domain_levels[style$domain_levels %in% observed_domains],
+        sort(setdiff(observed_domains, style$domain_levels))
+    )
+
+    dom_pal <- make_domain_palette(observed_domains, style)
+
     df <- df |>
         dplyr::mutate(
             domain = factor(as.character(domain), levels = dom_levels),
             vi_source = factor(as.character(vi_source), levels = names(style$shape_vals))
         )
-    
+
     have_ci <- is.finite(pooled["est"]) && is.finite(pooled["lb"]) && is.finite(pooled["ub"])
+
     subtitle_txt <- if (have_ci) {
-        paste0("Pooled standardised estimate [95% CI] = ",
-               scales::percent(pooled["est"], accuracy = 0.1), " [",
-               scales::percent(pooled["lb"], accuracy = 0.1), ", ",
-               scales::percent(pooled["ub"], accuracy = 0.1), "]")
+        paste0(
+            "Pooled standardised estimate [95% CI] = ",
+            scales::percent(pooled["est"], accuracy = 0.1), " [",
+            scales::percent(pooled["lb"], accuracy = 0.1), ", ",
+            scales::percent(pooled["ub"], accuracy = 0.1), "]"
+        )
     } else if (is.finite(pooled["est"])) {
-        paste0("Pooled standardised estimate [95% CI] = ",
-               scales::percent(pooled["est"], accuracy = 0.1), " [NA, NA]")
+        paste0(
+            "Pooled standardised estimate [95% CI] = ",
+            scales::percent(pooled["est"], accuracy = 0.1), " [NA, NA]"
+        )
     } else {
         "Pooled estimate not available"
     }
-    
+
     p <- ggplot(df, aes(x = est, y = row_lab)) +
-        { if (is.finite(pooled["est"])) geom_vline(xintercept = pooled["est"], linetype = 2, linewidth = 0.5, colour = "grey40", na.rm = TRUE) } +
-        geom_pointrange(aes(xmin = ci_l, xmax = ci_u, shape = vi_source, colour = domain),
-                        size = style$point_size, linewidth = style$line_width, alpha = style$alpha) +
-        scale_x_continuous(labels = scales::percent_format(accuracy = style$x_label_accuracy), limits = style$x_limits) +
+        {
+            if (is.finite(pooled["est"])) {
+                geom_vline(
+                    xintercept = pooled["est"],
+                    linetype = 2,
+                    linewidth = 0.5,
+                    colour = "grey40",
+                    na.rm = TRUE
+                )
+            }
+        } +
+        geom_pointrange(
+            aes(
+                xmin = ci_l,
+                xmax = ci_u,
+                shape = vi_source,
+                colour = domain
+            ),
+            size = style$point_size,
+            linewidth = style$line_width,
+            alpha = style$alpha
+        ) +
+        scale_x_continuous(
+            labels = scales::percent_format(accuracy = style$x_label_accuracy),
+            limits = style$x_limits
+        ) +
         scale_shape_manual(
             name   = "Variance source",
             values = style$shape_vals,
-            labels = style$shape_labs
+            labels = style$shape_labs,
+            drop   = FALSE
         ) +
         scale_colour_manual(
             name   = "Movement behaviour\ndomain",
@@ -670,7 +749,12 @@ plot_forest <- function(df, pooled, title_txt, file_name, style = plt_style) {
             breaks = dom_levels,
             drop   = FALSE
         ) +
-        labs(title = title_txt, subtitle = subtitle_txt, x = "Proportion", y = "Validation rows") +
+        labs(
+            title = title_txt,
+            subtitle = subtitle_txt,
+            x = "Proportion",
+            y = "Validation rows"
+        ) +
         theme_minimal(base_size = 12, base_family = "Arial") +
         theme(
             panel.grid.major.y = element_blank(),
@@ -680,13 +764,19 @@ plot_forest <- function(df, pooled, title_txt, file_name, style = plt_style) {
             plot.margin        = margin(8, 70, 8, 8)
         ) +
         coord_cartesian(clip = "off")
-    
+
     fpath <- file.path(out_dir, "figures", file_name)
-    ragg::agg_png(fpath,
-                  width  = style$width,
-                  height = style$base_h + style$row_px * nrow(df),
-                  res = style$res)
-    print(p); dev.off()
+
+    ragg::agg_png(
+        fpath,
+        width  = style$width,
+        height = style$base_h + style$row_px * nrow(df),
+        res = style$res
+    )
+
+    print(p)
+    dev.off()
+
     invisible(NULL)
 }
 

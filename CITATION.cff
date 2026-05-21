@@ -1,11 +1,12 @@
 cff-version: 1.2.0
-message: "If you use this software or repository, please cite it."
-title: "Scoping explorer of accelerometer-based prediction models for 24-hour movement behaviour analysis (SCOPE-MOVE): An interactive web application"
-version: 1.0.5
-date-released: 2026-02-19
+message: "If you use SCOPE-MOVE, please cite the software release and the associated study when available."
+title: "SCOPE-MOVE: Evidence Explorer for Method Selection"
+version: 2.0.0
+date-released: 2026-05-14
 license: GPL-3.0-or-later
 repository-code: "https://github.com/miltheo/SCOPE-MOVE"
-url: "https://miltheo.shinyapps.io/SCOPE-MOVE/"
+url: "https://scope-move.miltheo.com"
+doi: "10.5281/zenodo.18704633"
 type: software
 authors:
   - family-names: Theophilus
