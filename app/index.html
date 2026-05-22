@@ -3,19 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SCOPE-MOVE Evidence Explorer</title>
-  <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml">
-  <link rel="icon" href="assets/favicon-32.png?v=3" type="image/png" sizes="32x32">
-  <link rel="alternate icon" href="favicon.ico?v=3">
+  <title>SCOPE-MOVE evidence explorer</title>
   <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <header class="app-header">
     <div class="brand-lockup">
-      <div class="brand-logos">
-        <a href="https://labda-project.eu/" target="_blank" rel="noopener" aria-label="Open LABDA project website"><img src="assets/labda_logo.png" alt="LABDA logo"></a>
-        <a href="https://www.lboro.ac.uk/" target="_blank" rel="noopener" aria-label="Open Loughborough University website"><img class="lu-logo" src="assets/lu_logo.png" alt="Loughborough University logo"></a>
-      </div>
       <div>
         <p class="eyebrow">SCOPE-MOVE evidence explorer for method selection</p>
         <h1>SCOPE-MOVE</h1>
@@ -138,10 +131,10 @@
           </label>
           <label>Pooled line
             <select id="poolMethodSelect">
-              <option value="manuscript">Manuscript covariate pooled line</option>
+              <option value="manuscript">Covariate-adjusted orientation line</option>
               <option value="simple">Simple random-effects line, no covariates</option>
             </select>
-            <span class="filter-hint" title="The manuscript option uses available manuscript covariates where possible. The simple option uses a random-effects line with no covariates.">Reference line for orientation.</span>
+            <span class="filter-hint" title="The covariate-adjusted option uses available review covariates where possible. The simple option uses a random-effects line with no covariates.">Reference line for orientation.</span>
           </label>
           <fieldset>
             <legend>Domains</legend>
@@ -286,7 +279,7 @@
             <div><strong>Metric origin</strong><p>How a reported performance metric was produced, for example macro-averaging across classes, micro-averaging pooled counts, per-class reporting, aggregate confusion matrix computation, or unclear origin.</p></div>
             <div><strong>SD origin</strong><p>The extracted source of standard deviation or variation, such as participants, validation folds, behaviour classes, folds plus classes, external test variation, or not reported.</p></div>
             <div><strong>Model source / prior publication</strong><p>The extraction field describing whether the model was published previously and, when reported, which prior study or algorithm it came from.</p></div>
-            <div><strong>Pooled line</strong><p>The vertical dashed line in the Primary Tool. The manuscript option uses available manuscript covariates; the simple option uses no covariates.</p></div>
+            <div><strong>Pooled line</strong><p>The vertical dashed line in the Primary Tool. The covariate-adjusted option uses available review covariates; the simple option uses no covariates.</p></div>
             <div><strong>Above pooled</strong><p>Rows with estimates greater than the current pooled line. They are highlighted to guide follow-up inspection, not to declare a best model.</p></div>
             <div><strong>DOI linkage</strong><p>Clicking DOI-linked validation rows opens the source paper in a new tab.</p></div>
             <div><strong>QUADAS-2 domains</strong><p>Quality domains are patient selection/study design, index measure, criterion measure, and flow/timing.</p></div>
@@ -324,8 +317,8 @@
               <li>Extracted SDs were converted to sampling variances and divided by cross-validation folds when SDs reflected CV, or by number of behaviour classes when SDs reflected class variation. When SDs were unavailable, a lower-bounded behaviour-domain-specific median constant variance was used to stabilise weights.</li>
               <li>The constructed variance was used to build the displayed 95% confidence interval for each validation estimate.</li>
               <li>For meta-analysis, classifier metrics are analysed on the logit scale and back-transformed to proportions for display.</li>
-              <li>The manuscript pooled line represents a participant-weighted meta-regression orientation for the selected subset, using the manuscript covariate set where available. The simple pooled line is a random-effects line with no covariates.</li>
-              <li>The manuscript covariate pooled line uses the manuscript covariate set: centred number of behaviour classes, centred validation folds, missingness indicators, test environment, test protocol, and behaviour domain.</li>
+              <li>The covariate-adjusted orientation line represents a browser-side orientation estimate for the selected subset, using the review covariate set where available. The simple pooled line is a random-effects line with no covariates.</li>
+              <li>The covariate-adjusted orientation line uses the review covariate set: centred number of behaviour classes, centred validation folds, missingness indicators, test environment, test protocol, and behaviour domain.</li>
               <li>Covariates that are constant or effectively unavailable in the filtered subset are dropped from that pooled-line calculation and listed under the plot.</li>
               <li>The simple random-effects line uses the validation table variances and includes no covariates.</li>
               <li>The dashed pooled line can mask heterogeneity across behaviours, protocols, devices, and populations.</li>

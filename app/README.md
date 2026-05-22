@@ -2,7 +2,7 @@
 
 This folder contains the canonical SCOPE-MOVE v2.0.0 application.
 
-SCOPE-MOVE v2.0.0 is a static HTML, CSS, and JavaScript application. It replaces the earlier Shiny prototype with a self-contained browser deployment that can be hosted from this folder without a server-side runtime.
+SCOPE-MOVE v2.0.0 is a web-based HTML, CSS, and JavaScript application. It replaces the earlier Shiny prototype with a self-contained browser deployment that can be hosted from this folder without a server-side runtime.
 
 The v2.0.0 evidence base updates the review coverage to April 2026, extending the previous search date of August 2024.
 
@@ -11,8 +11,7 @@ The v2.0.0 evidence base updates the review coverage to April 2026, extending th
 - `index.html`: application entry point.
 - `app.js`: filtering, navigation, pooled-line, ranking, table, and chart logic.
 - `styles.css`: visual system and responsive layout rules.
-- `data.js`: generated static data bundle used by the browser.
-- `assets/`: logos, favicon files, documentation, and public runtime assets.
+- `data.js`: generated data bundle used by the browser.
 - `data/`: app-specific source files read by `build-data.js`.
 
 ## Launch
@@ -38,4 +37,4 @@ The app data bundle is independent of the generated manuscript-facing files unde
 
 ## Deployment Note
 
-For static hosting, deploy the contents of this folder together. The required runtime files are `index.html`, `app.js`, `styles.css`, `data.js`, `favicon.ico`, and the `assets/` folder.
+For static hosting, deploy the public runtime files in this folder together: `index.html`, `app.js`, `styles.css`, `data.js`, and the `data/` folder. Branding assets and favicons are intentionally ignored by Git and should only be added to a deployment outside the public repository if needed.

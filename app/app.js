@@ -471,7 +471,7 @@
   }
 
   function performanceSummaryCards(rows, pooled) {
-    const studies = unique(rows.map((row) => row.study)).length;
+    const studies = unique(rows.map((row) => row.id || row.study)).length;
     const participants = rows.map((row) => row.participants).filter(Number.isFinite).reduce((a, b) => a + b, 0);
     const estimates = rows.map((row) => row.estimate).filter(Number.isFinite);
     const abovePooled = pooled ? rows.filter((row) => Number.isFinite(row.estimate) && row.estimate > pooled.est).length : 0;
@@ -560,7 +560,7 @@
     })).filter((item) => Number.isFinite(item.y) && Number.isFinite(item.variance) && item.x);
 
     if (effects.length < 3 || !design.columns.length) {
-      const fallback = participantWeightedPooled(rows, "Manuscript covariate pooled line");
+      const fallback = participantWeightedPooled(rows, "Covariate-adjusted orientation line");
       fallback.covariates = covariates;
       fallback.note = "Covariate fit unavailable for this subset; displayed as participant-weighted orientation.";
       return fallback;
@@ -573,7 +573,7 @@
     );
 
     if (!fit) {
-      const fallback = participantWeightedPooled(rows, "Manuscript covariate pooled line");
+      const fallback = participantWeightedPooled(rows, "Covariate-adjusted orientation line");
       fallback.covariates = covariates;
       fallback.note = "Covariate fit unavailable for this subset; displayed as participant-weighted orientation.";
       return fallback;
@@ -599,10 +599,10 @@
       est,
       low: Number.isFinite(se) ? clamp(est - 1.96 * se, 0, 1) : NaN,
       high: Number.isFinite(se) ? clamp(est + 1.96 * se, 0, 1) : NaN,
-      source: "Manuscript covariate pooled line",
+      source: "Covariate-adjusted orientation line",
       covariates,
       designColumns: design.columns,
-      note: "Exploratory browser calculation using the manuscript covariate set available in the validation table."
+      note: "Exploratory browser calculation using the review covariate set available in the validation table."
     };
   }
 
@@ -762,7 +762,7 @@
 
     target.innerHTML = `<div class="pool-details-grid">
       <div class="pool-details-card">
-        <strong>Manuscript pooled estimate</strong>
+        <strong>Covariate-adjusted orientation line</strong>
         <p>${ciText}. Rows above this line are highlighted and should be inspected with protocol, population, device, and validation type.</p>
       </div>
       <div class="pool-details-card">
@@ -2125,7 +2125,7 @@
     const cards = [
       ["Author and repository", "Millen J. Theophilus", `<a class="link-button" href="https://github.com/miltheo/SCOPE-MOVE" target="_blank" rel="noopener">Open GitHub repository</a>`],
       ["Software citation", titleMatch ? titleMatch[1] : "SCOPE-MOVE", `<a class="link-button" href="https://github.com/miltheo/SCOPE-MOVE/blob/main/LICENSE" target="_blank" rel="noopener">GPL-3.0-or-later license</a><p>Explorer version ${APP_VERSION}; repository citation metadata version ${versionMatch ? versionMatch[1] : "n.a."}.</p>`],
-      ["Associated study", "SCOPE-MOVE is a product of a future scoping review study currently at journal submission stage.", "Use the forthcoming manuscript citation alongside the software release once available."],
+      ["Associated study", "SCOPE-MOVE is linked to a scoping review manuscript currently at journal submission stage.", "Use the forthcoming manuscript citation alongside the software release once available."],
       ["Zenodo repository", "Archived software record", `<a class="link-button" href="https://doi.org/10.5281/zenodo.18704633" target="_blank" rel="noopener">Open Zenodo DOI</a><p>Use this for reproducible software citation context.</p>`],
       ["Source rows", "Classifier extraction, study characteristics, quality assessment, and app validation tables are indexed.", `<button class="ghost-button nav-action" data-target-view="data" data-dataset="classifierInput">Open data workbench</button>`]
     ];

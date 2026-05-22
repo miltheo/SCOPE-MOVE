@@ -1,7 +1,7 @@
 {
-  "title": "SCOPE-MOVE: Evidence Explorer for Method Selection",
+  "title": "SCOPE-MOVE: evidence explorer for method selection",
   "upload_type": "software",
-  "description": "SCOPE-MOVE is an interactive dashboard to explore research studies training or testing wrist-accelerometer-based prediction models for classifying sleep, sedentary behaviour, or physical activity. Version 2.0.0 replaces the earlier Shiny prototype with a static HTML, CSS, and JavaScript Evidence Explorer. The repository preserves the reproducible extraction inputs, analysis scripts, app data-building workflow, and manuscript-facing outputs associated with the scoping review study, which is currently at journal submission stage.",
+  "description": "SCOPE-MOVE is an interactive dashboard to explore research studies training or testing wrist-accelerometer-based prediction models for classifying sleep, sedentary behaviour, or physical activity. Version 2.0.0 replaces the earlier Shiny prototype with a web-based evidence explorer. The repository preserves the reproducible extraction inputs, analysis scripts, app data-building workflow, and documentation needed to regenerate manuscript-facing outputs associated with the scoping review study, which is currently at journal submission stage.",
   "license": "GPL-3.0-or-later",
   "access_right": "open",
   "version": "2.0.0",
@@ -12,7 +12,7 @@
     "criterion validity",
     "prediction models",
     "evidence explorer",
-    "static web application",
+    "web application",
     "scoping review"
   ],
   "related_identifiers": [

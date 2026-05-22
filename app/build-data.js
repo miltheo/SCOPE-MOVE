@@ -21,7 +21,7 @@ const docs = {
   changelog: "CHANGELOG.md",
   citation: "CITATION.cff",
   zenodo: ".zenodo.json",
-  dataDictionary: "app/assets/Data_Dictionary.pdf"
+  dataDictionary: "analysis/inputs/Data_Dictionary.pdf"
 };
 
 function abs(rel) {
@@ -331,7 +331,9 @@ const checks = {
 const docBundle = Object.fromEntries(Object.entries(docs).map(([key, rel]) => {
   if (rel.endsWith(".pdf")) {
     const stat = fs.statSync(abs(rel));
-    const url = rel.startsWith("app/") ? rel.slice(4) : rel;
+    const url = rel.startsWith("app/")
+      ? rel.slice(4)
+      : `https://github.com/miltheo/SCOPE-MOVE/blob/main/${rel}`;
     return [key, { path: rel, url, bytes: stat.size }];
   }
   return [key, { path: rel, text: readText(rel) }];
@@ -347,7 +349,8 @@ const payload = {
   summaries: {
     classifierRows: classifier.length,
     classifierValidationIds: uniqueValues(classifier, "val_id").length,
-    classifierStudies: uniqueValues(classifier, "study").length,
+    classifierStudies: uniqueValues(classifier, "id").length,
+    classifierStudyLabels: uniqueValues(classifier, "study").length,
     classifierStudyIds: uniqueValues(classifier, "id").length,
     remlRows: reml.length,
     energyRows: energy.length,

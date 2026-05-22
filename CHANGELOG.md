@@ -5,7 +5,7 @@ This file records repository-level SCOPE-MOVE changes. User-facing application c
 ## 2.0.0 (2026-05-14)
 
 ### Changed
-- Replaced the earlier Shiny app codebase with a static HTML, CSS, and JavaScript application.
+- Replaced the earlier Shiny app codebase with a web-based HTML, CSS, and JavaScript application.
 - Updated the scoping review evidence base to April 2026, extending the previous August 2024 search date.
 - Made `app/` the canonical static deployment folder.
 - Standardised relative paths so the app can run locally, from `/app/`, or from a web-root deployment.
@@ -14,7 +14,7 @@ This file records repository-level SCOPE-MOVE changes. User-facing application c
 - Stopped tracking generated files under `analysis/outputs/`; these outputs are regenerated locally from `analysis/scripts/`.
 
 ### Added
-- Static SCOPE-MOVE Evidence Explorer with Overview, Primary Tool, Model Ranking, Studies, Quality, Instructions, and Data sections.
+- SCOPE-MOVE evidence explorer with Overview, Primary Tool, Model Ranking, Studies, Quality, Instructions, and Data sections.
 - Generated `app/data.js` browser bundle built from reproducible extraction inputs and app-specific support files.
 - Repository-level changelog for v2.0.0 release preparation.
 

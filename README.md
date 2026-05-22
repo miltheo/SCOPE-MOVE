@@ -16,6 +16,8 @@ This repository contains:
 
 Generated analysis outputs under `analysis/outputs/` are intentionally ignored by Git. They can be regenerated locally from the scripts and inputs in `analysis/`.
 
+App branding assets and favicons are intentionally ignored by Git. The public repository is limited to files needed for reliable scientific reuse, reproducible analysis, and FAIR software/data citation.
+
 ## Documentation
 
 - App details, deployment notes, and app data rebuild instructions are in `app/README.md`.

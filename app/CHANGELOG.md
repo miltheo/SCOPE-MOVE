@@ -6,7 +6,7 @@ This file records user-visible application changes only. Repository maintenance 
 
 | Version | Date | Release type | User-visible changes (summary) |
 |---|---:|---|---|
-| 2.0.0 | 2026-05-14 | Major | Rebuilt as a static Evidence Explorer and updated the review evidence base through April 2026. |
+| 2.0.0 | 2026-05-14 | Major | Rebuilt as a web-based evidence explorer and updated the review evidence base through April 2026. |
 | 1.0.5 | 2026-02-20 | Patch | Cleaned datasets and added Zenodo DOI. |
 | 1.0.4 | 2026-02-20 | Patch | Added Data Dictionary and harmonised file names. |
 | 1.0.3 | 2026-02-15 | Patch | Replaced the sidebar theme selector with a persistent floating theme toggle and redesigned the Home and Instructions tabs. |
@@ -17,7 +17,7 @@ This file records user-visible application changes only. Repository maintenance 
 ## 2.0.0 (2026-05-14)
 
 ### Changed
-- Rebuilt the application as a static HTML, CSS, and JavaScript dashboard, replacing the earlier Shiny interface.
+- Rebuilt the application as a web-based HTML, CSS, and JavaScript dashboard, replacing the earlier Shiny interface.
 - Updated the displayed evidence base through April 2026, extending the previous August 2024 search date.
 - Consolidated runtime files in `app/` for static hosting and manual deployment.
 - Updated app paths and asset references to support local use, repository hosting, and web-root deployment.
