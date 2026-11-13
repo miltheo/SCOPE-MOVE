@@ -6,6 +6,7 @@ This file records user-visible application changes only. Repository maintenance 
 
 | Version | Date | Release type | User-visible changes (summary) |
 |---|---:|---|---|
+| 2.1.0 | 2026-11-13 | Minor | Exact manuscript summaries and heterogeneity context for supported filters; retained browser and simple pooling for other views. |
 | 2.0.0 | 2026-05-14 | Major | Rebuilt as a web-based evidence explorer and updated the review evidence base through April 2026. |
 | 1.0.5 | 2026-02-20 | Patch | Cleaned datasets and added Zenodo DOI. |
 | 1.0.4 | 2026-02-20 | Patch | Added Data Dictionary and harmonised file names. |
@@ -13,6 +14,15 @@ This file records user-visible application changes only. Repository maintenance 
 | 1.0.2 | 2026-02-05 | Patch | Added theme selector, app-wide dark-mode styling, plot rendering improvements, and updated Home guidance. |
 | 1.0.1 | 2026-01-21 | Patch | Added Home tab, pooled estimate card, pooling method toggle, and rebuilt Forest Plot layout. |
 | 1.0.0 | Prototype | Baseline | Initial prototype with interactive forest plot, pooled estimate line, DOI click-through, dataset table, and instructions page. |
+
+## 2.1.0 (2026-11-13)
+
+### Changed
+- Updated classifier working variances and validation intervals from the R analyses.
+- Matched supported selections to exact R-derived manuscript estimates and confidence intervals.
+- Retained browser covariate-adjusted estimates for other selections and the simple random-effects option; identified the method used in the pooled-line details.
+- Added residual I² and Q_E, Satterthwaite degrees of freedom and variance provenance for supported manuscript selections.
+- Refreshed the energy-expenditure extraction metadata exposed in the Data view.
 
 ## 2.0.0 (2026-05-14)
 

@@ -343,6 +343,7 @@ const payload = {
   generatedAt: new Date().toISOString(),
   sources: { ...csvFiles, qualityAssessmentTool: qualityToolFile },
   records,
+  manuscriptPooled: JSON.parse(readText("app/data/manuscript_pooled.json")),
   qualityAssessmentTool: parseQualityAssessmentTool(readText(qualityToolFile)),
   docs: docBundle,
   checks,

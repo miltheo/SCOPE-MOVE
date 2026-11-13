@@ -1,6 +1,6 @@
 # =====================================================================
 # Classifiers meta-analysis (F1, Sensitivity, Specificity)
-# Outputs: pooled tables, method contrasts, forest-style plots, descriptives
+# Prepares classifier data and model functions for the manuscript analyses.
 # Author: Millen James Theophilus (GitHub: miltheo)
 # =====================================================================
 
@@ -11,18 +11,11 @@ rm(list = ls()); gc()
 # -----------------------------
 
 in_dir  <- file.path("analysis", "inputs")
-out_dir <- file.path("analysis", "outputs", "classifiers")
 
-# uncomment these 2 lines if you want to run locally
-# in_dir  <- file.path("..", "analysis", "inputs")
-# out_dir <- file.path("..", "analysis", "outputs", "classifiers")
 
 csv_path <- file.path(in_dir, "Extraction_Classifiers.csv")
 stopifnot(file.exists(csv_path))
 
-dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-dir.create(file.path(out_dir, "tables"),  showWarnings = FALSE, recursive = TRUE)
-dir.create(file.path(out_dir, "figures"), showWarnings = FALSE, recursive = TRUE)
 
 # -----------------------------
 # Settings (set as per study results, options available for sensitivity analysis)
@@ -32,26 +25,18 @@ treat_external_as_fold <- FALSE
 weight_by_participants <- TRUE
 use_two_level_random <- TRUE
 include_env_prot_domain <- TRUE
-run_method_subgroups <- TRUE
-run_domain_pooled <- TRUE
-run_domain_method_contrasts <- TRUE
-standardize_over <- "within_group"    # within_group | overall
+standardize_over <- "within_group"    # participant-weighted reference distribution within each method group
 eps_prob <- 1e-3
+domain_levels <- c("Sleep","Activity type","Activity intensity","Energy expenditure")
 
-# Forest plot settings
-forest_res <- 300
-forest_width_px <- 2500
-forest_row_px <- 45
-forest_base_h_px <- 550
-
-# -----------------------------
 # Packages
 # -----------------------------
-req <- c("readr","dplyr","stringr","tidyr","ggplot2","purrr","ragg","forcats","scales",
+req <- c("readr","dplyr","stringr","tidyr","purrr","forcats",
          "janitor","metafor","clubSandwich","glue","tibble","tidyselect")
-to_install <- setdiff(req, rownames(installed.packages()))
+to_install <- req[!vapply(req, requireNamespace, logical(1), quietly = TRUE)]
 if (length(to_install)) install.packages(to_install)
 invisible(lapply(req, library, character.only = TRUE))
+source(file.path("analysis", "scripts", "analysis_helpers.R"))
 
 # -----------------------------
 # Helpers
@@ -69,7 +54,7 @@ var_logit_from_sd <- function(p, sd, k = 1) {
 
 classify_method_group <- function(method_chr) {
     m <- stringr::str_to_lower(dplyr::coalesce(method_chr, ""))
-    is_thresh <- stringr::str_detect(m, "threshold|linear|glm|cut.?point|rule|heuristic|if[- ]?else")
+    is_thresh <- !stringr::str_detect(m, "non[ -]?linear") & stringr::str_detect(m, "threshold|linear|glm|cut.?point|rule|heuristic|if[- ]?else")
     dplyr::if_else(is_thresh, "traditional", "non-traditional")
 }
 
@@ -86,69 +71,6 @@ first_author_year <- function(df) {
     idc <- coalesce_col(df, c("id"))
     if (!all(is.na(idc))) return(glue::glue("Row {idc}"))
     rep(NA_character_, nrow(df))
-}
-
-# -----------------------------
-# Forest style (match manuscript)
-# -----------------------------
-plt_style <- list(
-    res    = forest_res,
-    width  = forest_width_px,
-    row_px = forest_row_px,
-    base_h = forest_base_h_px,
-    alpha  = 0.95,
-    point_size = 0.35,
-    line_width  = 0.35,
-    x_label_accuracy = 1,
-    x_limits = c(0, 1),
-    shape_vals = c(cv_folds = 16, classes = 17, external = 15, constant = 1),
-    shape_labs = c(
-        cv_folds = "From CV folds",
-        classes  = "From classes",
-        external = "External test SD",
-        constant = "Constant"
-    ),
-    okabe_ito = c(
-        "#CC79A7", "#E69F00", "#56B4E9", "#009E73",
-        "#F0E442", "#0072B2", "#D55E00", "#000000"
-    ),
-    domain_levels = c(
-        "Sleep",
-        "Activity type",
-        "Activity intensity",
-        "Energy expenditure"
-    )
-)
-
-make_domain_palette <- function(levels, style = plt_style) {
-
-    observed <- unique(as.character(levels))
-    observed <- observed[!is.na(observed) & observed != ""]
-
-    canonical <- style$domain_levels
-
-    base_pal <- stats::setNames(
-        style$okabe_ito[seq_along(canonical)],
-        canonical
-    )
-
-    extra <- sort(setdiff(observed, canonical))
-
-    if (length(extra)) {
-        extra_pal <- stats::setNames(
-            rep(style$okabe_ito[(length(canonical) + 1):length(style$okabe_ito)],
-                length.out = length(extra)),
-            extra
-        )
-        base_pal <- c(base_pal, extra_pal)
-    }
-
-    ordered_levels <- c(
-        canonical[canonical %in% observed],
-        extra
-    )
-
-    base_pal[ordered_levels]
 }
 
 # -----------------------------
@@ -172,11 +94,11 @@ if (!is.na(domain_col)) {
     domain_chr <- stringr::str_squish(as.character(dat0[[domain_col]]))
     domain_chr[is.na(domain_chr) | domain_chr == ""] <- "Unknown"
 
-    extra_domain_levels <- sort(setdiff(unique(domain_chr), plt_style$domain_levels))
+    extra_domain_levels <- sort(setdiff(unique(domain_chr), domain_levels))
 
     dat0$domain <- factor(
         domain_chr,
-        levels = c(plt_style$domain_levels, extra_domain_levels)
+        levels = c(domain_levels, extra_domain_levels)
     )
 
 } else {
@@ -187,7 +109,7 @@ if (!"study" %in% names(dat0)) stop("Column 'study' is required (FirstAuthor Yea
 
 dat0 <- dat0 |>
     mutate(
-        study_id = factor(study),
+        study_id = factor(id),
         val_id = dplyr::coalesce(as.character(coalesce_col(dat0, c("val_id","validation_id"), NA)), as.character(dplyr::row_number())),
         n_classes = suppressWarnings(as.numeric(n_classes)),
         k_folds = suppressWarnings(as.numeric(k_folds)),
@@ -213,6 +135,8 @@ dat0 <- dat0 |>
         sens_sd = ifelse(sd_origin == "classes" & is.finite(sens_sd) & sens_sd == 0, NA_real_, sens_sd),
         spec_sd = ifelse(sd_origin == "classes" & is.finite(spec_sd) & spec_sd == 0, NA_real_, spec_sd)
     )
+
+validate_study_keys(dat0)
 
 # -----------------------------
 # Long metric table
@@ -266,8 +190,16 @@ vi_raw <- switch(
     stop("weight_mode must be one of: equal, fold, class, fold_or_external")
 )
 
-const_vi <- if (any(is.finite(vi_raw))) stats::median(vi_raw, na.rm = TRUE) else 0.25
-const_vi <- max(const_vi, 0.05)
+variance_groups <- interaction(d_all$metric, d_all$domain, drop = TRUE)
+const_vi <- ave(vi_raw, variance_groups, FUN = function(x) {
+    if (!any(is.finite(x))) stop("No usable variance in a metric/domain group")
+    max(stats::median(x[is.finite(x)]), 0.05)
+})
+variance_imputation <- dplyr::tibble(metric = d_all$metric, domain = d_all$domain,
+    usable_reported = is.finite(vi_raw), replacement = as.numeric(const_vi)) |>
+    dplyr::group_by(metric, domain) |>
+    dplyr::summarise(rows = dplyr::n(), observed = sum(usable_reported),
+      imputed = sum(!usable_reported), replacement = dplyr::first(replacement), .groups = "drop")
 
 d_all <- d_all |>
     mutate(
@@ -328,97 +260,14 @@ fit_metric <- function(dfm) {
 
 pooled_standardized <- function(fit, dfm, weight_by_n = FALSE, n_col = "n_participants") {
     X <- as.matrix(fit$model$X)
-    beta <- fit$model$beta
-    if (!is.null(colnames(X)) && !is.null(names(beta))) X <- X[, names(beta), drop = FALSE]
-    eta <- as.numeric(X %*% as.numeric(beta))
-    p_i <- clamp_prob(plogis(eta), eps = eps_prob)
-    if (weight_by_n && n_col %in% names(dfm)) {
-        w <- dfm[[n_col]]; if (!any(is.finite(w))) w <- rep(1, nrow(dfm))
-    } else w <- rep(1, nrow(dfm))
-    w <- w / sum(w, na.rm = TRUE)
-    est <- sum(w * p_i, na.rm = TRUE)
-    
-    V_CR <- try(clubSandwich::vcovCR(fit$model, type = fit$vcov_type, cluster = dfm$study_id), silent = TRUE)
-    if (inherits(V_CR, "try-error") || any(!is.finite(V_CR))) return(c(est = est, lb = NA_real_, ub = NA_real_))
-    
-    J <- colSums((w * p_i * (1 - p_i)) * X, na.rm = TRUE)
-    se <- sqrt(drop(J %*% V_CR %*% J))
-    if (!is.finite(se) || se < 1e-8) return(c(est = est, lb = NA_real_, ub = NA_real_))
-    
-    lb <- max(est - 1.96 * se, 0)
-    ub <- min(est + 1.96 * se, 1)
-    c(est = est, lb = lb, ub = ub)
+    p_i <- clamp_prob(plogis(as.numeric(X %*% as.numeric(fit$model$beta))), eps = eps_prob)
+    w <- if (weight_by_n) dfm[[n_col]] else rep(1, nrow(dfm))
+    w[!is.finite(w)] <- 0
+    if (sum(w) <= 0) stop("No participant weights")
+    w <- w / sum(w)
+    robust_delta(fit$model, dfm, sum(w * p_i), colSums((w * p_i * (1-p_i))*X), c(0,1))
 }
 
-run_meta <- function(d, subgroup = NULL) {
-    if (!is.null(subgroup)) d <- d |> dplyr::filter(method_group == subgroup)
-    if (!nrow(d)) return(NULL)
-    d |>
-        dplyr::group_by(metric) |>
-        dplyr::group_map(~{
-            fit <- fit_metric(.x)
-            if (is.null(fit)) {
-                return(tibble::tibble(metric = .y$metric, k_rows = nrow(.x), clusters = NA_integer_,
-                                      vcov_type = NA_character_, kept_mods = NA_character_,
-                                      pooled_std_est = NA_real_, pooled_std_lb = NA_real_, pooled_std_ub = NA_real_))
-            }
-            std <- pooled_standardized(fit, .x, weight_by_n = weight_by_participants)
-            tibble::tibble(metric = .y$metric,
-                           k_rows = nrow(.x),
-                           clusters = fit$clusters,
-                           vcov_type = fit$vcov_type,
-                           kept_mods = if (length(fit$kept_mods)) paste(fit$kept_mods, collapse = ", ") else "(intercept only)",
-                           pooled_std_est = as.numeric(std["est"]),
-                           pooled_std_lb  = as.numeric(std["lb"]),
-                           pooled_std_ub  = as.numeric(std["ub"]))
-        }) |>
-        dplyr::bind_rows()
-}
-
-round_tbl <- function(x) x |> dplyr::mutate(across(dplyr::matches("pooled_"), ~ round(as.numeric(.x), 4)))
-
-# -----------------------------
-# Pooled results
-# -----------------------------
-res_all <- run_meta(d_all)
-res_thr <- if (run_method_subgroups) run_meta(d_all, "traditional") else NULL
-res_oth <- if (run_method_subgroups) run_meta(d_all, "non-traditional") else NULL
-
-readr::write_csv(round_tbl(res_all), file.path(out_dir, "tables", "meta_results_all.csv"))
-if (!is.null(res_thr)) readr::write_csv(round_tbl(res_thr), file.path(out_dir, "tables", "meta_results_traditional.csv"))
-if (!is.null(res_oth)) readr::write_csv(round_tbl(res_oth), file.path(out_dir, "tables", "meta_results_nontraditional.csv"))
-
-# -----------------------------
-# Domain pooled
-# -----------------------------
-pooled_within_domain <- function(dom, met) {
-    dfm <- d_all |> dplyr::filter(metric == met, as.character(domain) == as.character(dom))
-    if (nrow(dfm) < 3) return(NULL)
-    fit <- fit_metric(dfm); if (is.null(fit)) return(NULL)
-    std <- pooled_standardized(fit, dfm, weight_by_n = weight_by_participants)
-    tibble::tibble(
-        domain = as.character(dom),
-        metric = met,
-        k_rows = nrow(dfm),
-        clusters = dplyr::n_distinct(dfm$study_id),
-        pooled_std_est = as.numeric(std["est"]),
-        pooled_std_lb  = as.numeric(std["lb"]),
-        pooled_std_ub  = as.numeric(std["ub"]),
-        kept_mods = if (length(fit$kept_mods)) paste(fit$kept_mods, collapse = ", ") else "(intercept only)"
-    )
-}
-
-res_dom <- NULL
-if (isTRUE(run_domain_pooled)) {
-    doms <- sort(unique(as.character(d_all$domain)))
-    mets <- c("F1","Sensitivity","Specificity")
-    res_dom <- purrr::map_dfr(doms, \(d) purrr::map_dfr(mets, \(m) pooled_within_domain(d, m)))
-    if (nrow(res_dom)) readr::write_csv(round_tbl(res_dom), file.path(out_dir, "tables", "pooled_within_domain.csv"))
-}
-
-# -----------------------------
-# Method contrasts (joint model, standardized only)
-# -----------------------------
 .coef_names <- function(fit) {
     nb <- names(fit$beta)
     if (!is.null(nb) && length(nb) == length(fit$beta)) return(nb)
@@ -479,173 +328,32 @@ fit_joint_metric <- function(df_metric, include_domain = TRUE) {
 
 standardized_for_method <- function(fit, df_metric, method_level = c("non-traditional","traditional")) {
     method_level <- match.arg(method_level)
-    X <- as.matrix(fit$X)
-    bn <- .coef_names(fit)
-    if (!is.null(colnames(X))) X <- X[, bn, drop = FALSE]
-    beta <- as.numeric(fit$beta)
-    
-    md <- if (method_level == "traditional") 1 else 0
-    X_new <- X_with_method(X, md)
-    eta <- as.numeric(X_new %*% beta)
-    p_i <- clamp_prob(plogis(eta), eps = eps_prob)
-    
-    w_raw <- if (weight_by_participants && "n_participants" %in% names(df_metric)) df_metric$n_participants else rep(1, nrow(df_metric))
-    w_raw[!is.finite(w_raw)] <- 0
-    
-    if (standardize_over == "within_group") {
-        mask <- df_metric$method_group == method_level
-        w <- ifelse(mask, w_raw, 0)
-    } else w <- w_raw
-    
-    if (sum(w, na.rm = TRUE) == 0) w <- rep(1, length(w))
-    w <- w / sum(w, na.rm = TRUE)
-    
-    est <- sum(w * p_i, na.rm = TRUE)
-    
-    Vcr <- clubSandwich::vcovCR(fit, type = "CR2", cluster = df_metric$study_id)
-    J <- colSums((w * p_i * (1 - p_i)) * X_new, na.rm = TRUE); names(J) <- bn
-    se <- sqrt(max(.qform(J, Vcr), 0))
-    if (!is.finite(se) || se < 1e-8) return(c(est = est, lb = NA_real_, ub = NA_real_))
-    
-    c(est = est, lb = max(est - 1.96 * se, 0), ub = min(est + 1.96 * se, 1))
+    Xn <- X_with_method(as.matrix(fit$X), if (method_level == "traditional") 1 else 0)
+    p_i <- clamp_prob(plogis(as.numeric(Xn %*% as.numeric(fit$beta))), eps = eps_prob)
+    w <- ifelse(df_metric$method_group == method_level, df_metric$n_participants, 0)
+    w[!is.finite(w)] <- 0; w <- w / sum(w)
+    robust_delta(fit, df_metric, sum(w*p_i), colSums((w*p_i*(1-p_i))*Xn), c(0,1))
 }
 
 contrast_methods <- function(fit, df_metric) {
     a <- standardized_for_method(fit, df_metric, "non-traditional")
     b <- standardized_for_method(fit, df_metric, "traditional")
-    
-    X <- as.matrix(fit$X)
-    bn <- .coef_names(fit)
-    if (!is.null(colnames(X))) X <- X[, bn, drop = FALSE]
-    Vcr <- clubSandwich::vcovCR(fit, type = "CR2", cluster = df_metric$study_id)
-    
-    grad_std <- function(md, method_level) {
-        Xn <- X_with_method(X, md)
-        eta <- as.numeric(Xn %*% as.numeric(fit$beta))
-        p_i <- clamp_prob(plogis(eta), eps = eps_prob)
-        
-        w_raw <- if (weight_by_participants && "n_participants" %in% names(df_metric)) df_metric$n_participants else rep(1, nrow(df_metric))
-        w_raw[!is.finite(w_raw)] <- 0
-        
-        if (standardize_over == "within_group") {
-            mask <- df_metric$method_group == method_level
-            w <- ifelse(mask, w_raw, 0)
-        } else w <- w_raw
-        
-        if (sum(w, na.rm = TRUE) == 0) w <- rep(1, length(w))
-        w <- w / sum(w, na.rm = TRUE)
-        
-        J <- colSums((w * p_i * (1 - p_i)) * Xn, na.rm = TRUE)
-        names(J) <- bn
-        J
+    grad <- function(md) {
+      Xn <- X_with_method(as.matrix(fit$X), md)
+      p <- clamp_prob(plogis(as.numeric(Xn %*% as.numeric(fit$beta))), eps = eps_prob)
+      method_level <- if (md == 0) "non-traditional" else "traditional"
+      w <- ifelse(df_metric$method_group == method_level, df_metric$n_participants, 0)
+      w[!is.finite(w)] <- 0; w <- w/sum(w)
+      colSums((w*p*(1-p))*Xn)
     }
-    
-    J_o <- grad_std(0, "non-traditional")
-    J_t <- grad_std(1, "traditional")
-    
-    diff <- as.numeric(a["est"] - b["est"])
-    se   <- sqrt(max(.qform(J_o - J_t, Vcr), 0))
-    z    <- diff / se
-    p    <- 2 * pnorm(-abs(z))
-    lb   <- max(diff - 1.96 * se, -1)
-    ub   <- min(diff + 1.96 * se,  1)
-    
-    tibble::tibble(
-        other_std = a["est"], other_std_lb = a["lb"], other_std_ub = a["ub"],
-        thresh_std = b["est"], thresh_std_lb = b["lb"], thresh_std_ub = b["ub"],
-        diff_std = diff, diff_std_lb = lb, diff_std_ub = ub, p_std = p
-    )
+    d <- robust_delta(fit, df_metric, as.numeric(a["est"]-b["est"]), grad(0)-grad(1), c(-1,1))
+    tibble::tibble(other_std=a["est"],other_std_lb=a["lb"],other_std_ub=a["ub"],
+      thresh_std=b["est"],thresh_std_lb=b["lb"],thresh_std_ub=b["ub"],
+      diff_std=d["est"],diff_std_lb=d["lb"],diff_std_ub=d["ub"],p_std=d["p"],
+      df_satt=d["df"],se_delta=d["se"])
 }
 
-compare_methods_overall <- function(met) {
-    dfm <- d_all |> dplyr::filter(metric == met) |> dplyr::mutate(method_group = factor(method_group, levels = c("non-traditional","traditional")))
-    if (nrow(dfm) < 3 || dplyr::n_distinct(dfm$method_group[!is.na(dfm$method_group)]) < 2) return(NULL)
-    fit <- fit_joint_metric(dfm, include_domain = TRUE); if (is.null(fit)) return(NULL)
-    contrast_methods(fit, dfm) |> dplyr::mutate(metric = met)
-}
-
-compare_methods_within_domain <- function(dom, met) {
-    dfm <- d_all |> dplyr::filter(metric == met, as.character(domain) == as.character(dom)) |>
-        dplyr::mutate(method_group = factor(method_group, levels = c("non-traditional","traditional")))
-    if (nrow(dfm) < 3 || dplyr::n_distinct(dfm$method_group[!is.na(dfm$method_group)]) < 2) return(NULL)
-    fit <- fit_joint_metric(dfm, include_domain = FALSE); if (is.null(fit)) return(NULL)
-    contrast_methods(fit, dfm) |> dplyr::mutate(domain = as.character(dom), metric = met)
-}
-
-mets <- c("F1","Sensitivity","Specificity")
-
-res_cmp_overall <- purrr::map_dfr(mets, compare_methods_overall)
-if (nrow(res_cmp_overall)) readr::write_csv(res_cmp_overall, file.path(out_dir, "tables", "method_contrast_results_overall.csv"))
-
-res_cmp_domain <- NULL
-if (isTRUE(run_domain_method_contrasts)) {
-    doms <- sort(unique(as.character(d_all$domain)))
-    res_cmp_domain <- purrr::map_dfr(doms, \(d) purrr::map_dfr(mets, \(m) compare_methods_within_domain(d, m)))
-    if (nrow(res_cmp_domain)) readr::write_csv(res_cmp_domain, file.path(out_dir, "tables", "method_contrast_by_domain.csv"))
-}
-
-# -----------------------------
-# Descriptives
-# -----------------------------
-desc_overall <- tibble::tibble(
-    item  = c("Validations (rows)","Unique studies","Domains"),
-    value = c(nrow(dat0), dplyr::n_distinct(dat0$id), dplyr::n_distinct(dat0$domain))
-)
-
-summ_metric_df <- function(metric_col) {
-    sub <- dat0[!is.na(dat0[[metric_col]]), , drop = FALSE]
-    pv  <- suppressWarnings(as.numeric(sub$n_participants))
-    pv  <- pv[is.finite(pv)]
-    per_study <- sub |>
-        dplyr::group_by(id) |>
-        dplyr::summarise(n = suppressWarnings(max(n_participants, na.rm = TRUE)), .groups = "drop") |>
-        dplyr::filter(is.finite(n))
-    qs <- if (length(pv)) stats::quantile(pv, c(.25,.5,.75), na.rm = TRUE) else c(NA,NA,NA)
-    tibble::tibble(
-        metric = metric_col,
-        validations = nrow(sub),
-        studies_reporting = nrow(per_study),
-        participants_total_approx = sum(per_study$n, na.rm = TRUE),
-        median_n_per_validation = qs[2],
-        iqr_low = qs[1],
-        iqr_high = qs[3]
-    )
-}
-
-desc_by_metric <- dplyr::bind_rows(
-    summ_metric_df("f1_mean"),
-    summ_metric_df("sens_mean"),
-    summ_metric_df("spec_mean")
-)
-
-desc_by_domain <- d_all |>
-    dplyr::group_by(domain) |>
-    dplyr::summarise(
-        validations = dplyr::n(),
-        studies = dplyr::n_distinct(id),
-        median_n = stats::median(n_participants, na.rm = TRUE),
-        iqr_low  = stats::quantile(n_participants, 0.25, na.rm = TRUE),
-        iqr_high = stats::quantile(n_participants, 0.75, na.rm = TRUE),
-        .groups = "drop"
-    )
-
-readr::write_csv(desc_overall,   file.path(out_dir, "tables", "descriptives_overall.csv"))
-readr::write_csv(desc_by_metric, file.path(out_dir, "tables", "descriptives_by_metric.csv"))
-readr::write_csv(desc_by_domain, file.path(out_dir, "tables", "descriptives_by_domain.csv"))
-
-qc_boundary <- d_all |>
-    dplyr::group_by(domain, method_group, metric) |>
-    dplyr::summarise(
-        all_ge_0999 = all(mean >= 0.999, na.rm = TRUE),
-        all_le_0001 = all(mean <= 0.001, na.rm = TRUE),
-        k = dplyr::n(),
-        .groups = "drop"
-    )
-readr::write_csv(qc_boundary, file.path(out_dir, "tables", "qc_boundary_flags.csv"))
-
-# -----------------------------
-# Forest plots (patched to match manuscript)
-# -----------------------------
+# Validation-level estimates for the app.
 build_plot_df <- function(d, metric_name) {
     d |>
         dplyr::filter(metric == metric_name) |>
@@ -662,152 +370,12 @@ build_plot_df <- function(d, metric_name) {
         dplyr::mutate(row_lab = forcats::fct_inorder(row_lab))
 }
 
-get_pooled <- function(metric_name, res_tbl) {
-    r <- res_tbl |> dplyr::filter(metric == metric_name)
-    if (!nrow(r)) return(c(est = NA_real_, lb = NA_real_, ub = NA_real_))
-    c(est = as.numeric(r$pooled_std_est), lb = as.numeric(r$pooled_std_lb), ub = as.numeric(r$pooled_std_ub))
-}
-
-get_pooled_domain <- function(metric_name, dom, res_tbl_domain) {
-    r <- res_tbl_domain |> dplyr::filter(metric == metric_name, domain == dom)
-    if (!nrow(r)) return(c(est = NA_real_, lb = NA_real_, ub = NA_real_))
-    c(est = as.numeric(r$pooled_std_est), lb = as.numeric(r$pooled_std_lb), ub = as.numeric(r$pooled_std_ub))
-}
-
-plot_forest <- function(df, pooled, title_txt, file_name, style = plt_style) {
-
-    observed_domains <- unique(as.character(df$domain))
-    observed_domains <- observed_domains[!is.na(observed_domains) & observed_domains != ""]
-
-    dom_levels <- c(
-        style$domain_levels[style$domain_levels %in% observed_domains],
-        sort(setdiff(observed_domains, style$domain_levels))
-    )
-
-    dom_pal <- make_domain_palette(observed_domains, style)
-
-    df <- df |>
-        dplyr::mutate(
-            domain = factor(as.character(domain), levels = dom_levels),
-            vi_source = factor(as.character(vi_source), levels = names(style$shape_vals))
-        )
-
-    have_ci <- is.finite(pooled["est"]) && is.finite(pooled["lb"]) && is.finite(pooled["ub"])
-
-    subtitle_txt <- if (have_ci) {
-        paste0(
-            "Pooled standardised estimate [95% CI] = ",
-            scales::percent(pooled["est"], accuracy = 0.1), " [",
-            scales::percent(pooled["lb"], accuracy = 0.1), ", ",
-            scales::percent(pooled["ub"], accuracy = 0.1), "]"
-        )
-    } else if (is.finite(pooled["est"])) {
-        paste0(
-            "Pooled standardised estimate [95% CI] = ",
-            scales::percent(pooled["est"], accuracy = 0.1), " [NA, NA]"
-        )
-    } else {
-        "Pooled estimate not available"
-    }
-
-    p <- ggplot(df, aes(x = est, y = row_lab)) +
-        {
-            if (is.finite(pooled["est"])) {
-                geom_vline(
-                    xintercept = pooled["est"],
-                    linetype = 2,
-                    linewidth = 0.5,
-                    colour = "grey40",
-                    na.rm = TRUE
-                )
-            }
-        } +
-        geom_pointrange(
-            aes(
-                xmin = ci_l,
-                xmax = ci_u,
-                shape = vi_source,
-                colour = domain
-            ),
-            size = style$point_size,
-            linewidth = style$line_width,
-            alpha = style$alpha
-        ) +
-        scale_x_continuous(
-            labels = scales::percent_format(accuracy = style$x_label_accuracy),
-            limits = style$x_limits
-        ) +
-        scale_shape_manual(
-            name   = "Variance source",
-            values = style$shape_vals,
-            labels = style$shape_labs,
-            drop   = FALSE
-        ) +
-        scale_colour_manual(
-            name   = "Movement behaviour\ndomain",
-            values = dom_pal,
-            breaks = dom_levels,
-            drop   = FALSE
-        ) +
-        labs(
-            title = title_txt,
-            subtitle = subtitle_txt,
-            x = "Proportion",
-            y = "Validation rows"
-        ) +
-        theme_minimal(base_size = 12, base_family = "Arial") +
-        theme(
-            panel.grid.major.y = element_blank(),
-            panel.grid.minor   = element_blank(),
-            legend.position    = "bottom",
-            legend.box         = "vertical",
-            plot.margin        = margin(8, 70, 8, 8)
-        ) +
-        coord_cartesian(clip = "off")
-
-    fpath <- file.path(out_dir, "figures", file_name)
-
-    ragg::agg_png(
-        fpath,
-        width  = style$width,
-        height = style$base_h + style$row_px * nrow(df),
-        res = style$res
-    )
-
-    print(p)
-    dev.off()
-
-    invisible(NULL)
-}
-
-for (m in mets) {
-    df <- build_plot_df(d_all, m)
-    pooled <- get_pooled(m, res_all)
-    plot_forest(df, pooled, paste0("Forest-style plot: ", m), paste0("forest_", m, "_all.png"))
-}
-
-if (run_method_subgroups) {
-    d_thr <- d_all |> dplyr::filter(method_group == "traditional")
-    d_oth <- d_all |> dplyr::filter(method_group == "non-traditional")
-    for (m in mets) {
-        df <- build_plot_df(d_thr, m); pooled <- get_pooled(m, res_thr)
-        plot_forest(df, pooled, paste0("Forest-style plot: ", m, " (traditional)"), paste0("forest_", m, "_traditional.png"))
-        df <- build_plot_df(d_oth, m); pooled <- get_pooled(m, res_oth)
-        plot_forest(df, pooled, paste0("Forest-style plot: ", m, " (non-traditional)"), paste0("forest_", m, "_nontraditional.png"))
-    }
-}
-
-if (!is.null(res_dom) && nrow(res_dom)) {
-    doms <- sort(unique(as.character(d_all$domain)))
-    for (d in doms) {
-        for (m in mets) {
-            df <- build_plot_df(d_all |> dplyr::filter(as.character(domain) == d), m)
-            pooled <- get_pooled_domain(m, d, res_dom)
-            safe_dom <- stringr::str_replace_all(d, "[^A-Za-z0-9]+", "_")
-            plot_forest(df, pooled, paste0("Forest-style plot: ", m, " (", d, ")"),
-                        paste0("forest_", m, "_bydomain_", safe_dom, ".png"))
-        }
-    }
-}
-
-cat("Done. Outputs saved to: ", normalizePath(out_dir), "\n")
+# Validation-level estimates and variances for the app.
+app_rows <- build_plot_df(d_all, "F1") |>
+  dplyr::bind_rows(build_plot_df(d_all, "Sensitivity"), build_plot_df(d_all, "Specificity")) |>
+  dplyr::mutate(study_label = study, study_id = as.character(id))
+meta <- dat0 |> dplyr::select(val_id, is_the_model_published_previously, method_sub,
+  validation_type, age_group, test_device)
+app_rows <- dplyr::left_join(app_rows, meta, by = "val_id")
+readr::write_csv(app_rows, file.path("app", "data", "REML_data_long2.csv"))
+analysis_result <- list(dat0=dat0, d_all=d_all, variance_imputation=variance_imputation)

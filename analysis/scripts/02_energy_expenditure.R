@@ -1,7 +1,7 @@
 # =====================================================================
 # Energy expenditure meta-analysis (association models)
 # Outcome: MAPE (proportion; lower is better)
-# Outputs: pooled table, method contrast table, forest-style plot
+# Prepares MAPE data and model functions for the manuscript analyses.
 # Author: Millen James Theophilus (GitHub: miltheo)
 # =====================================================================
 
@@ -11,18 +11,11 @@ rm(list = ls()); gc()
 # Paths
 # -----------------------------
 in_dir  <- file.path("analysis", "inputs")
-out_dir <- file.path("analysis", "outputs", "energy_expenditure")
 
-# uncomment these 2 lines if you want to run locally
-# in_dir  <- file.path("..", "analysis", "inputs") 
-# out_dir <- file.path("..", "analysis", "outputs", "energy_expenditure")
 
 csv_path <- file.path(in_dir, "Extraction_EnergyExpenditure.csv")
 stopifnot(file.exists(csv_path))
 
-dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)                         # make base output dir
-dir.create(file.path(out_dir, "tables"), showWarnings = FALSE, recursive = TRUE)    # make tables dir
-dir.create(file.path(out_dir, "figures"), showWarnings = FALSE, recursive = TRUE)   # make figures dir
 
 # -----------------------------
 # Settings (set as per study results, options available for sensitivity analysis)
@@ -31,21 +24,18 @@ weight_mode <- "fold"                 # equal | fold | fold_or_external
 weight_by_participants <- TRUE
 use_two_level_random <- TRUE
 include_env_prot_domain <- TRUE
-standardize_over <- "within_group"    # within_group | overall
+standardize_over <- "within_group"    # participant-weighted reference distribution within each method group
 
-forest_res <- 300
-forest_width_px <- 4000
-forest_row_px <- 18
-forest_base_h_px <- 2000
 
 # -----------------------------
 # Packages
 # -----------------------------
-req <- c("readr","dplyr","stringr","tidyr","ggplot2","purrr","ragg","forcats","scales",
+req <- c("readr","dplyr","stringr","tidyr","purrr",
          "janitor","metafor","clubSandwich","glue","tibble","tidyselect")
-to_install <- setdiff(req, rownames(installed.packages()))
+to_install <- req[!vapply(req, requireNamespace, logical(1), quietly = TRUE)]
 if (length(to_install)) install.packages(to_install)
 invisible(lapply(req, library, character.only = TRUE))
+source(file.path("analysis", "scripts", "analysis_helpers.R"))
 
 # -----------------------------
 # Helpers
@@ -54,7 +44,7 @@ na_tokens <- c("NA","NaN","","n.r.","n.r","n.a.","n.a","n/a","N/A","NR","nr")
 
 classify_method_group <- function(method_chr) {
     s <- stringr::str_to_lower(dplyr::coalesce(method_chr, ""))
-    is_linear <- stringr::str_detect(s, "linear|glm|heuristic|threshold|cut.?point|rule")
+    is_linear <- !stringr::str_detect(s, "non[ -]?linear") & stringr::str_detect(s, "linear|glm|heuristic|threshold|cut.?point|rule")
     dplyr::if_else(is_linear, "traditional", "non-traditional")
 }
 
@@ -121,7 +111,7 @@ if (!is.na(mape_sd_col)) {
 
 dat0 <- dat0 |>
     mutate(
-        study_id = factor(study),
+        study_id = factor(id),
         row_id = dplyr::row_number(),
         val_id = dplyr::coalesce(as.character(coalesce_col(dat0, c("val_id","validation_id"), NA)), as.character(row_id)),
         k_folds = suppressWarnings(as.numeric(k_folds)),
@@ -131,6 +121,8 @@ dat0 <- dat0 |>
         test_protocol = factor(dplyr::coalesce(test_protocol, NA_character_)),
         method_group = classify_method_group(method)
     )
+
+validate_study_keys(dat0)
 
 d_ee <- dat0 |>
     transmute(
@@ -215,37 +207,11 @@ fit_metric <- function(dfm) {
 
 pooled_standardized <- function(fit, dfm) {
     X <- as.matrix(fit$model$X)
-    b <- align_beta_to_X(fit$model$beta, X)
-    eta <- as.numeric(X %*% b)
-    
-    w <- if (weight_by_participants && "n_participants" %in% names(dfm)) dfm$n_participants else rep(1, nrow(dfm))
-    w <- as.numeric(w); w[!is.finite(w)] <- 0
-    if (sum(w) == 0) w <- rep(1, length(w))
-    w <- w / sum(w)
-    
-    est <- sum(w * eta, na.rm = TRUE)
-    
-    V_CR <- try(clubSandwich::vcovCR(fit$model, type = fit$vcov_type, cluster = dfm$study_id), silent = TRUE)
-    if (inherits(V_CR, "try-error") || any(!is.finite(V_CR))) return(c(est = est, lb = NA_real_, ub = NA_real_))
-    
-    J <- wcolsum(X, w)
-    se <- sqrt(drop(J %*% V_CR %*% J))
-    c(est = est, lb = est - 1.96 * se, ub = est + 1.96 * se)
+    eta <- as.numeric(X %*% align_beta_to_X(fit$model$beta, X))
+    w <- dfm$n_participants; w[!is.finite(w)] <- 0; w <- w/sum(w)
+    robust_delta(fit$model, dfm, sum(w*eta), wcolsum(X,w))
 }
 
-fit_all <- fit_metric(d_ee)
-pooled <- if (is.null(fit_all)) c(est = NA_real_, lb = NA_real_, ub = NA_real_) else pooled_standardized(fit_all, d_ee)
-
-out_tbl <- tibble::tibble(metric = "MAPE",
-                          pooled_std_est = pooled["est"],
-                          pooled_std_lb  = pooled["lb"],
-                          pooled_std_ub  = pooled["ub"])
-readr::write_csv(out_tbl |> mutate(across(starts_with("pooled_"), ~ round(100 * as.numeric(.x), 2))),
-                 file.path(out_dir, "tables", "ee_meta_results_all.csv"))
-
-# -----------------------------
-# Method contrast (joint model, standardized only)
-# -----------------------------
 fit_joint <- function(dfm) {
     if (nrow(dfm) < 3 || dplyr::n_distinct(dfm$method_group[!is.na(dfm$method_group)]) < 2) return(NULL)
     mods <- c("c_k_folds","miss_k_folds")
@@ -283,119 +249,27 @@ X_with_method <- function(X, method_dummy) {
 standardized_for_method <- function(fit, dfm, method_level = c("non-traditional","traditional")) {
     method_level <- match.arg(method_level)
     X <- as.matrix(fit$X)
-    b <- align_beta_to_X(fit$beta, X)
-    
-    md <- if (method_level == "traditional") 1 else 0
-    Xn <- X_with_method(X, md)
-    eta <- as.numeric(Xn %*% b)
-    
-    w_raw <- if (weight_by_participants && "n_participants" %in% names(dfm)) dfm$n_participants else rep(1, nrow(dfm))
-    w_raw <- as.numeric(w_raw); w_raw[!is.finite(w_raw)] <- 0
-    
-    if (standardize_over == "within_group") {
-        mask <- dfm$method_group == method_level
-        w <- ifelse(mask, w_raw, 0)
-    } else w <- w_raw
-    
-    if (sum(w, na.rm = TRUE) == 0) w <- rep(1, length(w))
-    w <- w / sum(w, na.rm = TRUE)
-    
-    est <- sum(w * eta, na.rm = TRUE)
-    
-    Vcr <- clubSandwich::vcovCR(fit, type = "CR2", cluster = dfm$study_id)
-    J <- wcolsum(Xn, w)
-    se <- sqrt(drop(J %*% Vcr %*% J))
-    
-    c(est = est, lb = est - 1.96 * se, ub = est + 1.96 * se, se = se)
+    Xn <- X_with_method(X, if (method_level == "traditional") 1 else 0)
+    eta <- as.numeric(Xn %*% align_beta_to_X(fit$beta,X))
+    w <- ifelse(dfm$method_group == method_level, dfm$n_participants, 0)
+    w[!is.finite(w)] <- 0; w <- w/sum(w)
+    robust_delta(fit,dfm,sum(w*eta),wcolsum(Xn,w))
 }
 
 contrast_methods <- function(fit, dfm) {
-    a <- standardized_for_method(fit, dfm, "non-traditional")
-    b <- standardized_for_method(fit, dfm, "traditional")
-    
+    a <- standardized_for_method(fit,dfm,"non-traditional")
+    b <- standardized_for_method(fit,dfm,"traditional")
+    w0 <- ifelse(dfm$method_group == "non-traditional", dfm$n_participants, 0)
+    w1 <- ifelse(dfm$method_group == "traditional", dfm$n_participants, 0)
+    w0[!is.finite(w0)] <- 0; w1[!is.finite(w1)] <- 0
+    w0 <- w0/sum(w0); w1 <- w1/sum(w1)
     X <- as.matrix(fit$X)
-    Vcr <- clubSandwich::vcovCR(fit, type = "CR2", cluster = dfm$study_id)
-    
-    grad_std <- function(md, method_level) {
-        Xn <- X_with_method(X, md)
-        w_raw <- if (weight_by_participants && "n_participants" %in% names(dfm)) dfm$n_participants else rep(1, nrow(dfm))
-        w_raw <- as.numeric(w_raw); w_raw[!is.finite(w_raw)] <- 0
-        if (standardize_over == "within_group") {
-            mask <- dfm$method_group == method_level
-            w <- ifelse(mask, w_raw, 0)
-        } else w <- w_raw
-        if (sum(w, na.rm = TRUE) == 0) w <- rep(1, length(w))
-        w <- w / sum(w, na.rm = TRUE)
-        wcolsum(Xn, w)
-    }
-    
-    J_o <- grad_std(0, "non-traditional")
-    J_l <- grad_std(1, "traditional")
-    
-    diff <- as.numeric(a["est"] - b["est"])
-    se   <- sqrt(max(drop((J_o - J_l) %*% Vcr %*% (J_o - J_l)), 0))
-    p    <- 2 * pnorm(-abs(diff / se))
-    
-    tibble::tibble(
-        other_std = a["est"], other_std_lb = a["lb"], other_std_ub = a["ub"],
-        linear_std = b["est"], linear_std_lb = b["lb"], linear_std_ub = b["ub"],
-        diff_std = diff, diff_std_lb = diff - 1.96 * se, diff_std_ub = diff + 1.96 * se,
-        p_std = p
-    )
+    g <- wcolsum(X_with_method(X,0),w0)-wcolsum(X_with_method(X,1),w1)
+    d <- robust_delta(fit,dfm,as.numeric(a["est"]-b["est"]),g)
+    tibble::tibble(other_std=a["est"],other_std_lb=a["lb"],other_std_ub=a["ub"],
+      linear_std=b["est"],linear_std_lb=b["lb"],linear_std_ub=b["ub"],
+      diff_std=d["est"],diff_std_lb=d["lb"],diff_std_ub=d["ub"],p_std=d["p"],
+      df_satt=d["df"],se_delta=d["se"])
 }
 
-df_cmp <- d_ee |> mutate(method_group = factor(method_group, levels = c("non-traditional","traditional")))
-fit_cmp <- fit_joint(df_cmp)
-if (!is.null(fit_cmp)) {
-    cmp <- contrast_methods(fit_cmp, df_cmp)
-    cmp_out <- cmp |>
-        mutate(across(where(is.numeric) & !matches("^p_"), ~ round(100 * as.numeric(.x), 2)),
-               across(matches("^p_"), ~ round(as.numeric(.x), 4)))
-    readr::write_csv(cmp_out, file.path(out_dir, "tables", "ee_method_contrast_results_overall.csv"))
-}
-
-# -----------------------------
-# Forest plot
-# -----------------------------
-build_plot_df <- function(d) {
-    d |>
-        mutate(
-            se_use = sqrt(vi_use),
-            est = mean,
-            ci_l = pmax(est - 1.96 * se_use, 0),
-            ci_u = est + 1.96 * se_use,
-            auth_year = first_author_year(dplyr::cur_data_all()),
-            method_lab = ifelse(is.na(method) | method == "", "Method n.r.", method),
-            y_label = glue::glue("{auth_year} - {method_lab} - {val_id}")
-        ) |>
-        arrange(est) |>
-        mutate(y_label = forcats::fct_rev(forcats::fct_inorder(y_label)))
-}
-
-dfp <- build_plot_df(d_ee)
-
-p <- ggplot(dfp, aes(x = est, y = y_label)) +
-    geom_vline(xintercept = as.numeric(pooled["est"]), linetype = 2, linewidth = 0.5, alpha = 0.85, na.rm = TRUE) +
-    geom_pointrange(aes(xmin = ci_l, xmax = ci_u, shape = vi_source),
-                    size = 0.3, linewidth = 0.3, alpha = 0.95) +
-    scale_x_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1)) +
-    scale_shape_manual(name = "Variance source",
-                       values = c(cv_folds = 16, external = 15, constant = 1),
-                       labels = c(cv_folds = "From CV folds", external = "External test SD", constant = "Constant")) +
-    labs(title = "Forest-style plot: MAPE (Energy expenditure)",
-         subtitle = paste0("Pooled standardised estimate [95% CI] = ",
-                           scales::percent(pooled["est"], accuracy = 0.1), " [",
-                           scales::percent(pooled["lb"], accuracy = 0.1), ", ",
-                           scales::percent(pooled["ub"], accuracy = 0.1), "]"),
-         x = "MAPE (proportion)", y = "Validation rows") +
-    theme_minimal(base_size = 18, base_family = "Arial") +
-    theme(panel.grid.major.y = element_blank(),
-          panel.grid.minor = element_blank(),
-          legend.position = "bottom",
-          plot.margin = margin(5, 30, 5, 5))
-
-fpath <- file.path(out_dir, "figures", "forest_MAPE_all.png")
-ragg::agg_png(fpath, width = forest_width_px, height = forest_base_h_px + forest_row_px * nrow(dfp), res = forest_res)
-print(p); dev.off()
-
-cat("Done. Outputs saved to: ", normalizePath(out_dir), "\n")
+analysis_result <- list(dat0=dat0, d_ee=d_ee)
