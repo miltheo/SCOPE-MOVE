@@ -7,7 +7,7 @@
 
   const DATA = window.SCOPE_MOVE_DATA;
   const R = DATA.records;
-  const APP_VERSION = "2.0.0";
+  const APP_VERSION = "2.1.0";
 
   const colors = {
     "Sleep": "#CC79A7",
@@ -121,7 +121,7 @@
       raw: row,
       valId: clean(row.val_id),
       id: clean(row.id),
-      study: clean(row.study_id),
+      study: clean(row.study_label || row.auth_year || row.study_id),
       method: clean(row.method),
       methodSub: clean(row.method_sub),
       methodGroup,
@@ -149,7 +149,7 @@
       device: clean(row.test_device),
       doi,
       doiUrl,
-      label: clean(row.row_lab) || [clean(row.study_id), clean(row.method), clean(row.val_id)].filter(Boolean).join(" - ")
+      label: clean(row.row_lab || row.y_label) || [clean(row.study_label || row.auth_year || row.study_id), clean(row.method), clean(row.val_id)].filter(Boolean).join(" - ")
     };
   });
 
@@ -543,13 +543,32 @@
     }
 
     if (method === "manuscript") {
-      return computeManuscriptPooled(usable);
+      const manuscript = computeManuscriptPooled(usable);
+      if (manuscript) return manuscript;
+      const fallback = computeBrowserAdjustedPooled(usable);
+      fallback.manuscriptSupported = false;
+      fallback.note = "No manuscript model matches this filtered selection. " + fallback.note;
+      return fallback;
     }
 
     return participantWeightedPooled(usable, "Participant-weighted pooled estimate");
   }
 
   function computeManuscriptPooled(rows) {
+    const signature = rows.map((row) => row.valId).sort().join(";");
+    const result = (DATA.manuscriptPooled || []).find((item) =>
+      item.metric === rows[0].metric && item.validation_ids.slice().sort().join(";") === signature);
+    if (!result) return null;
+    return {
+      est: result.est, low: result.low, high: result.high,
+      source: "Exact R-derived manuscript estimate", manuscriptSupported: true,
+      df: result.df, keptMods: result.kept_mods, context: result,
+      note: "Study- and validation-level random-effects model with participant-weighted marginal predictions and study-clustered robust inference." +
+        (result.method_group !== "all" ? " This separately fitted subgroup estimate differs from the joint-model contrasts in the manuscript comparison table." : "")
+    };
+  }
+
+  function computeBrowserAdjustedPooled(rows) {
     const covariates = covariateInfo(rows);
     const design = designMatrix(rows, covariates.kept);
     const effects = rows.map((row, index) => ({
@@ -560,7 +579,7 @@
     })).filter((item) => Number.isFinite(item.y) && Number.isFinite(item.variance) && item.x);
 
     if (effects.length < 3 || !design.columns.length) {
-      const fallback = participantWeightedPooled(rows, "Covariate-adjusted orientation line");
+      const fallback = participantWeightedPooled(rows, "Participant-weighted fallback");
       fallback.covariates = covariates;
       fallback.note = "Covariate fit unavailable for this subset; displayed as participant-weighted orientation.";
       return fallback;
@@ -573,7 +592,7 @@
     );
 
     if (!fit) {
-      const fallback = participantWeightedPooled(rows, "Covariate-adjusted orientation line");
+      const fallback = participantWeightedPooled(rows, "Participant-weighted fallback");
       fallback.covariates = covariates;
       fallback.note = "Covariate fit unavailable for this subset; displayed as participant-weighted orientation.";
       return fallback;
@@ -599,10 +618,10 @@
       est,
       low: Number.isFinite(se) ? clamp(est - 1.96 * se, 0, 1) : NaN,
       high: Number.isFinite(se) ? clamp(est + 1.96 * se, 0, 1) : NaN,
-      source: "Covariate-adjusted orientation line",
+      source: "Browser covariate-adjusted estimate",
       covariates,
       designColumns: design.columns,
-      note: "Exploratory browser calculation using the review covariate set available in the validation table."
+      note: "Exploratory browser calculation using the available review covariates, rather than the manuscript random-effects model or its cluster-robust inference."
     };
   }
 
@@ -755,6 +774,24 @@
       return;
     }
 
+    if (pooled.manuscriptSupported) {
+      const context = pooled.context;
+      const qP = context.QE_p < 0.001 ? "&lt; .001" : "= " + context.QE_p.toFixed(3).replace(/^0/, "");
+      const kept = context.kept_mods.split(",").map((key) => {
+        const def = covariateDefs.find((item) => item.key === key.trim());
+        return def ? def.label : key.trim();
+      }).join("; ");
+      target.innerHTML = `<div class="pool-details-grid">
+        <div class="pool-details-card"><strong>${escapeHtml(pooled.source)}</strong><p>${pct(pooled.est, 1)} (95% CI ${pct(pooled.low, 1)} to ${pct(pooled.high, 1)}).</p></div>
+        <div class="pool-details-card"><strong>Residual I²</strong><p>${context.I2.toFixed(1)}% total; ${context.I2_study.toFixed(1)}% study and ${context.I2_validation.toFixed(1)}% validation components.</p></div>
+        <div class="pool-details-card"><strong>Residual Q<sub>E</sub></strong><p>Q<sub>E</sub>(${context.QE_df}) = ${context.QE.toFixed(1)}; p ${qP}.</p></div>
+        <div class="pool-details-card"><strong>Inference</strong><p>${escapeHtml(context.covariance_type)}; Satterthwaite df = ${pooled.df.toFixed(2)}.</p></div>
+        <div class="pool-details-card"><strong>Covariates retained in R</strong><p>${escapeHtml(kept)}</p></div>
+        <div class="pool-details-card"><strong>Working variances</strong><p>${context.reported_rows} derived; ${context.imputed_rows} imputed.</p></div>
+      </div><p class="pool-footnote">${escapeHtml(pooled.note)} Heterogeneity statistics depend on the working variances; Q<sub>E</sub> is not cluster-robust.</p>`;
+      return;
+    }
+
     const covariates = pooled.covariates || covariateInfo(rows);
     const kept = covariates.kept.map((item) => item.label).join("; ") || "Intercept only";
     const dropped = covariates.dropped.map((item) => `${item.label} (${item.reason})`).join("; ") || "None";
@@ -762,7 +799,7 @@
 
     target.innerHTML = `<div class="pool-details-grid">
       <div class="pool-details-card">
-        <strong>Covariate-adjusted orientation line</strong>
+        <strong>${escapeHtml(pooled.source)}</strong>
         <p>${ciText}. Rows above this line are highlighted and should be inspected with protocol, population, device, and validation type.</p>
       </div>
       <div class="pool-details-card">

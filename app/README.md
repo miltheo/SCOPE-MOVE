@@ -1,8 +1,8 @@
 # SCOPE-MOVE Application
 
-This folder contains the canonical SCOPE-MOVE v2.0.0 application.
+This folder contains the canonical SCOPE-MOVE v2.1.0 application.
 
-SCOPE-MOVE v2.0.0 is a web-based HTML, CSS, and JavaScript application. It replaces the earlier Shiny prototype with a self-contained browser deployment that can be hosted from this folder without a server-side runtime.
+SCOPE-MOVE v2.1.0 is a web-based HTML, CSS, and JavaScript application. It replaces the earlier Shiny prototype with a self-contained browser deployment that can be hosted from this folder without a server-side runtime.
 
 The v2.0.0 evidence base updates the review coverage to April 2026, extending the previous search date of August 2024.
 
@@ -33,7 +33,7 @@ node app/build-data.js
 
 The build reads reproducible source inputs from `analysis/inputs/` and app-specific support files from `app/data/`, then writes `app/data.js`.
 
-The app data bundle is independent of the generated manuscript-facing files under `analysis/outputs/`.
+To refresh the validation table and manuscript estimates before rebuilding the bundle, run `Rscript analysis/scripts/reproduce_manuscript.R`.
 
 ## Deployment Note
 

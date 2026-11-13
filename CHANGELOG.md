@@ -2,6 +2,15 @@
 
 This file records repository-level SCOPE-MOVE changes. User-facing application changes are tracked separately in `app/CHANGELOG.md`.
 
+## 2.1.0 (2026-11-13)
+
+### Changed
+- Updated classifier working variances, numeric study-ID clustering, method grouping and robust confidence intervals/tests.
+- Updated energy-expenditure extraction metadata and added the RMSE analysis, joint comparison and variance sensitivity analyses.
+- Added full-precision heterogeneity outputs and current manuscript forest plots as 600-dpi PNGs with above-pooled dividers; removed legacy and duplicate exports.
+- Exported exact R-derived classifier summaries and context for the app; regenerated its validation table and browser bundle.
+- Updated the data dictionary and citation metadata for 2.1.0.
+
 ## 2.0.0 (2026-05-14)
 
 ### Changed
